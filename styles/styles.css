@@ -1,0 +1,138 @@
+.extentMap {
+    width: 200px;
+    height: 200px;
+    padding-left: 5px;
+    padding-bottom: 10px;
+}
+
+.paImage {
+    float: left;
+    margin: 7px 7px 5px 2px;
+    border: 1px solid #ccc;
+}
+
+.paName {
+    margin-top: 7px;
+    font-size: 13px;
+    float: left;
+    width: 200px;
+}
+
+.paType {
+    color: #aaa;
+    font-size: 10px;
+    line-height: 20px;
+    font-family: Lucida Grande;
+}
+
+.paPercent {
+    float: right;
+    margin-top: 7px;
+    background-color: #333666;
+    color: #ffffff;
+    font-size: 9px;
+    border-radius: 400px;
+    height: 32px;
+    width: 32px;
+    text-align: center;
+    opacity: 0.9;
+}
+
+.paPercent:hover {
+    opacity: 1;
+}
+
+.paPercentText {
+    position: relative;
+    top: 25%;
+}
+
+.paList {
+    overflow: auto;
+}
+
+.paList ul {
+    width: 100%;
+    list-style-position: outside;
+    list-style: none;
+    padding: 0;
+    border-top: 1px solid #cccccc;
+    margin: 0;
+}
+
+.paList li {
+    margin: 0px;
+    color: #666;
+    cursor: default;
+    display: block;
+    font: menu;
+    font-size: 12px;
+    line-height: 16px;
+    overflow: hidden;
+    border-bottom: 1px solid #ccc
+}
+
+.paList li:nth-child(odd) {
+    background-color: #f6f6f6;
+}
+.paList li:nth-child(even) {
+    background-color: transparent;
+}
+
+.paList li:hover{
+    background-color: #FFFFD4;
+    color: #333333;
+    cursor: pointer
+}
+
+.paDiv{
+   overflow-x:hidden;
+   overflow-y:hidden;
+   padding:2px 5px;
+}
+
+.Status {
+    padding: 7px;
+    margin-top:10px;
+    margin-bottom:10px;
+    font: menu;
+    font-size: 22px;
+    opacity: 0.8;
+    border-bottom:2px solid #345678;
+}
+
+.EX {
+    background-color: #000000;
+    color: #902424;
+}
+
+.EW {
+    background-color: #000000;
+    color: #FFFFFF;
+}
+
+.CR {
+    background-color: #cc3333;
+    color: #FFFFFF;
+}
+
+.EN {
+    background-color: #cc6633;
+    color: #FFFFFF;
+}
+
+.VU {
+    background-color: #cc9900;
+    color: #FFFFFF;
+}
+
+.NT {
+    background-color: #006666;
+    color: #FFFFFF;
+}
+
+.LC {
+    background-color: #006666;
+    color: #FFFFFF;
+}
+
