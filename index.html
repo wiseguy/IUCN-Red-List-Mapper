@@ -252,7 +252,7 @@
                 var imageParameters = new esri.layers.ImageParameters(); //image parameters for the rdb layer
                 imageParameters.layerIds = [0]; //layer filter
                 imageParameters.layerOption = esri.layers.ImageParameters.LAYER_OPTION_SHOW;
-                rdbLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://46.51.139.201/ArcGIS/rest/services/Andrew/MapperDemo/MapServer?token=" + token, {
+                rdbLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer?token=" + token, {
                     "imageParameters": imageParameters,
                     opacity: 0.7
                 });
@@ -263,7 +263,7 @@
                 var imageParameters2 = new esri.layers.ImageParameters();
                 imageParameters2.layerIds = [1];
                 imageParameters2.layerOption = esri.layers.ImageParameters.LAYER_OPTION_SHOW;
-                protectionLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://46.51.139.201/ArcGIS/rest/services/Andrew/MapperDemo/MapServer?token=" + token, {
+                protectionLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer?token=" + token, {
                     "imageParameters": imageParameters2,
                     opacity: 0.7
                 });
@@ -271,7 +271,7 @@
                 var imageParameters3 = new esri.layers.ImageParameters();
                 imageParameters3.layerIds = [2];
                 imageParameters3.layerOption = esri.layers.ImageParameters.LAYER_OPTION_SHOW;
-                protectionLayer2 = new esri.layers.ArcGISDynamicMapServiceLayer("http://46.51.139.201/ArcGIS/rest/services/Andrew/MapperDemo/MapServer?token=" + token, {
+                protectionLayer2 = new esri.layers.ArcGISDynamicMapServiceLayer("http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer?token=" + token, {
                     "imageParameters": imageParameters3,
                     opacity: 0.4
                 });
@@ -317,7 +317,7 @@
             
             //GETS THE EXTENT OF THE PASSED SPECIES USING A GP TASK
             function getExtent(spcID){
-                gp = new esri.tasks.Geoprocessor("http://46.51.139.201/ArcGIS/rest/services/IUCN_Secure/GetExtent/GPServer/Get%20Extent?token=" + token);
+                gp = new esri.tasks.Geoprocessor("http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/GetExtent/GPServer/Get%20Extent?token=" + token);
                 var params = {
                     "ID_NO": spcID
                 };
@@ -380,7 +380,7 @@
             
             //CALLED WHEN THE PAGE LOADS AND GETS THE SPECIES INFO
             function getSpeciesInfo(spcID){
-                var queryTask = new esri.tasks.QueryTask("http://46.51.139.201/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/1?token=" + token); //instantiate a querytask that will be used to get the species binomial
+                var queryTask = new esri.tasks.QueryTask("http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/1?token=" + token); //instantiate a querytask that will be used to get the species binomial
                 var query = new esri.tasks.Query(); //instantiate a query to filter the query task
                 query.returnGeometry = false;
                 query.outFields = ["friendly_name", "rl_category"];
@@ -405,7 +405,7 @@
             
             //FUNCTION TO RETRIEVE ALL OF THE PROTECTED AREAS INFORMATION FOR THE SPECIES
             function getProtectedAreas(){
-                var queryTask = new esri.tasks.QueryTask("http://46.51.139.201/ArcGIS/rest/services/Andrew/MapperDemo/MapServer/1?token=" + token); //instantiate a querytask that will be used to get the protected area information
+                var queryTask = new esri.tasks.QueryTask("http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer/1?token=" + token); //instantiate a querytask that will be used to get the protected area information
                 var query = new esri.tasks.Query(); //instantiate a query to filter the query task
                 query.returnGeometry = false;
                 query.outFields = ["wdpaid", "pa_name", "pa_image", "pa_type", "pa_percent", "pa_x", "pa_y"];
