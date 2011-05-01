@@ -336,6 +336,7 @@
                     },
                     load: function(response){
                         var extent = new esri.geometry.Extent(response.extent);
+                        extent.spatialReference = new esri.SpatialReference({wkid:102100});
                         map.setExtent(extent, true);
                         dojo.connect(rdbLayer, "onUpdate", hideLoading); //now we have zoomed to the extent, wire up the rdblayer update to hide the loading icon when it has finished updating
                     },
