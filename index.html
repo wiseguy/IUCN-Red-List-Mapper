@@ -224,7 +224,7 @@
             
             function onLoad(){
                 ID_NO = getSpeciesID(); //get the species ID from the query string
-                getExtent(ID_NO); //get the extent of the current species
+                getExtent2(ID_NO); //get the extent of the current species
                 getSpeciesInfo(ID_NO); //get the species info
                 map = new esri.Map("map", {
                     wrapAround180: true
@@ -315,13 +315,32 @@
                 //                map.showZoomSlider();
             }
             
-            //GETS THE EXTENT OF THE PASSED SPECIES USING A GP TASK
+            //GETS THE EXTENT OF THE PASSED SPECIES USING A GP TASK - THIS HAS BEEN DEPRECATED - NOW USES AN SOE
             function getExtent(spcID){
                 gp = new esri.tasks.Geoprocessor("http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/GetExtent/GPServer/Get%20Extent?token=" + token);
                 var params = {
                     "ID_NO": spcID
                 };
                 gp.submitJob(params, jobCompleted);
+            }
+            
+            //GETS THE EXTENT OF THE PASSED SPECIES USING A SOE
+            function getExtent2(spcID){
+                esri.request({
+                    url: "http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer/exts/IUCNRedListSOE/GetSpeciesExtent",
+                    callbackParamName: "callback",
+                    content: {
+                        f: "json",
+                        ID_NO: spcID,
+                        token: token
+                    },
+                    load: function(response){
+                        var extent = new esri.geometry.Extent(response.extent);
+                        map.setExtent(extent, true);
+                        dojo.connect(rdbLayer, "onUpdate", hideLoading); //now we have zoomed to the extent, wire up the rdblayer update to hide the loading icon when it has finished updating
+                    },
+                    error: esriConfig.defaults.io.errorHandler
+                });
             }
             
             //AJAX RETURN CALL WITH THE EXTENT
@@ -541,7 +560,6 @@
                     </div>
                 </div>
             </div>
-        </div>
         </div>
     </body>
 </html>
