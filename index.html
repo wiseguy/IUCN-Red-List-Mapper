@@ -229,6 +229,8 @@
                 map = new esri.Map("map", {
                     wrapAround180: true
                 });
+                var fade = dojo.fadeIn({node: "map",duration: 250});
+                fade.play();
                 dojo.connect(map, "onLoad", showLoading); //disable the map navigation controls until we have zoomed to the species extent
                 extentMap = new esri.Map("extentMap", {
                     slider: false,
@@ -476,7 +478,7 @@
     </head>
     <body class="claro">
         <div dojotype="dijit.layout.BorderContainer" design="sidebar" id="borderContainer" gutters="false">
-            <div dojoType="dijit.layout.ContentPane" region="left" style="width:75%">
+            <div dojoType="dijit.layout.ContentPane" region="left" style="width:75%;height:100%">
                 <div id="navToolbar" dojoType="dijit.Toolbar" style="position:absolute;top:26px;z-index:100;left:35%;opacity:0.9">
                     <div dojoType="dijit.form.Button" id="zoomin" iconClass="zoominIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_IN);">
                     </div>
@@ -493,7 +495,7 @@
                     <div dojoType="dijit.form.Button" id="deactivate" iconClass="deactivateIcon" onClick="navToolbar.deactivate()">
                     </div>
                 </div>
-                <div id="map" dojotype="dijit.layout.ContentPane" style="border:solid thin silver;margin-left:10px;margin-bottom:10px;margin-top:10px;clear:right;">
+                <div id="map" dojotype="dijit.layout.ContentPane" style="opacity:0;border:solid thin silver;margin-left:10px;margin-bottom:10px;margin-top:10px;clear:right;">
                     <div id="loadingDiv" style="width:16px;left:50%;top:50%;position:absolute;z-index:100">
                         <img id="loadingImg" src="images/loading.gif" alt="Loading image"/>
                     </div>
