@@ -229,8 +229,6 @@
                 map = new esri.Map("map", {
                     wrapAround180: true
                 });
-                var fade = dojo.fadeIn({node: "map",duration: 250});
-                fade.play();
                 dojo.connect(map, "onLoad", showLoading); //disable the map navigation controls until we have zoomed to the species extent
                 extentMap = new esri.Map("extentMap", {
                     slider: false,
@@ -338,7 +336,9 @@
                     },
                     load: function(response){
                         var extent = new esri.geometry.Extent(response.extent);
-                        extent.spatialReference = new esri.SpatialReference({wkid:102100});
+                        extent.spatialReference = new esri.SpatialReference({
+                            wkid: 102100
+                        });
                         map.setExtent(extent, true);
                         dojo.connect(rdbLayer, "onUpdate", hideLoading); //now we have zoomed to the extent, wire up the rdblayer update to hide the loading icon when it has finished updating
                     },
@@ -418,7 +418,16 @@
                     dojo.attr(dojo.byId("species"), "class", "Status " + featureAttributes["rl_category"]);
                     dojo.doc.title = featureAttributes["friendly_name"]; //set the document title
                     dojo.byId("statusImage").src = "images/200px-Status_iucn3.1_" + featureAttributes["rl_category"] + ".svg.png";
-                    
+                    var fadeOut = dojo.fadeOut({
+                        node: "mainLoadingDiv",
+                        duration: 10
+                    });
+                    fadeOut.play(); //when all the data is loaded - hide the loading div
+                    var fade = dojo.fadeIn({
+                        node: "borderContainer",
+                        duration: 250
+                    });
+                    fade.play(); //show the border container which contains the map and the tab container
                 }
                 else {
                     dojo.byId("title").innerHTML = "No species found";
@@ -477,7 +486,10 @@
         </script>
     </head>
     <body class="claro">
-        <div dojotype="dijit.layout.BorderContainer" design="sidebar" id="borderContainer" gutters="false">
+        <div id="mainLoadingDiv" style="width:16px;left:50%;top:50%;position:absolute;z-index:100">
+            <img src="images/loading.gif" alt="Loading image"/>
+        </div>
+        <div dojotype="dijit.layout.BorderContainer" design="sidebar" id="borderContainer" gutters="false" style="opacity:0">
             <div dojoType="dijit.layout.ContentPane" region="left" style="width:75%;height:100%">
                 <div id="navToolbar" dojoType="dijit.Toolbar" style="position:absolute;top:26px;z-index:100;left:35%;opacity:0.9">
                     <div dojoType="dijit.form.Button" id="zoomin" iconClass="zoominIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_IN);">
@@ -495,7 +507,7 @@
                     <div dojoType="dijit.form.Button" id="deactivate" iconClass="deactivateIcon" onClick="navToolbar.deactivate()">
                     </div>
                 </div>
-                <div id="map" dojotype="dijit.layout.ContentPane" style="opacity:0;border:solid thin silver;margin-left:10px;margin-bottom:10px;margin-top:10px;clear:right;">
+                <div id="map" dojotype="dijit.layout.ContentPane" style="border:solid thin silver;margin-left:10px;margin-bottom:10px;margin-top:10px;clear:right;padding:0px">
                     <div id="loadingDiv" style="width:16px;left:50%;top:50%;position:absolute;z-index:100">
                         <img id="loadingImg" src="images/loading.gif" alt="Loading image"/>
                     </div>
