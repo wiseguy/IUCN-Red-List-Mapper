@@ -16,11 +16,8 @@
                 width: 100%;
                 height: 100%;
                 margin: 0px;
-            }
-            
-            #borderContainer {
-                width: 100%;
-                height: 100%;
+                padding: 0px;
+                overflow: hidden;
             }
             
             .zoominIcon {
@@ -248,42 +245,32 @@
                 dojo.connect(map, "onExtentChange", extentChanged); //wire the extent change event of the map to draw the polygon on the overview map
                 //                dojo.byId("copyright").innerHTML = "&nbsp;&copy; 2009 <a target=_blank href='http://cloudmade.com' tabindex=-1>CloudMade</a> - Map data <a target=_blank href='http://creativecommons.org/licenses/by-sa/2.0/' tabindex=-1>CCBYSA</a> 2009 <a target=_blank href='http://openstreetmap.org' tabindex=-1>OpenStreetMap.org</a> contributors - <a target=_blank href='http://cloudmade.com/terms_conditions' tabindex=-1>Terms of Use</a>&nbsp;";
                 
-                //RDB LAYER FOR THE MAP
-                var imageParameters = new esri.layers.ImageParameters(); //image parameters for the rdb layer
-                imageParameters.layerIds = [0]; //layer filter
-                imageParameters.layerOption = esri.layers.ImageParameters.LAYER_OPTION_SHOW;
-                rdbLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer?token=" + token, {
-                    "imageParameters": imageParameters,
-                    opacity: 0.7
-                });
-                layerDefinitions[0] = "ID_NO='" + ID_NO + "'"; //set the initial definition expression
-                rdbLayer.setLayerDefinitions(layerDefinitions); //apply the definition expression
-                map.addLayer(rdbLayer); //add the species layer
-                //PROTECTION LAYER FOR THE MAP
-                var imageParameters2 = new esri.layers.ImageParameters();
-                imageParameters2.layerIds = [1];
-                imageParameters2.layerOption = esri.layers.ImageParameters.LAYER_OPTION_SHOW;
-                protectionLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer?token=" + token, {
-                    "imageParameters": imageParameters2,
-                    opacity: 0.7
-                });
-                //ALL PROTECTION LAYER FOR THE MAP
-                var imageParameters3 = new esri.layers.ImageParameters();
-                imageParameters3.layerIds = [2];
-                imageParameters3.layerOption = esri.layers.ImageParameters.LAYER_OPTION_SHOW;
-                protectionLayer2 = new esri.layers.ArcGISDynamicMapServiceLayer("http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer?token=" + token, {
-                    "imageParameters": imageParameters3,
-                    opacity: 0.4
-                });
-                map.addLayer(protectionLayer2); //add the protection layer
+                //ADD THE DYNAMIC LAYERS TO THE MAP
+                rdbLayer = addDynamicLayer(0, "http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer", "ID_NO='" + ID_NO + "'", 0.7);
+                protectionLayer = addDynamicLayer(1, "http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer", null, 0.7);
+                protectionLayer2 = addDynamicLayer(2, "http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer", null, 0.4);
                 protectionLayer2.hide();
-                map.addLayer(protectionLayer); //add the protection layer
                 protectionLayer.hide();
-                var tabs = dijit.byId("tabs");
-                dojo.connect(tabs, "selectChild", changeTab);
                 getProtectedAreas();
                 navToolbar = new esri.toolbars.Navigation(map);
                 dojo.connect(navToolbar, "onExtentHistoryChange", extentHistoryChangeHandler);
+                showTab("info");
+            }
+            
+            function addDynamicLayer(layerID, url, definitionExpression, opacity){
+                var imageParameters = new esri.layers.ImageParameters(); //image parameters for the layer
+                imageParameters.layerIds = [layerID]; //layer filter
+                imageParameters.layerOption = esri.layers.ImageParameters.LAYER_OPTION_SHOW;
+                dynamicLayer = new esri.layers.ArcGISDynamicMapServiceLayer(url + "?token=" + token, {
+                    "imageParameters": imageParameters,
+                    opacity: opacity
+                });
+                if (definitionExpression) {
+                    layerDefinitions[layerID] = definitionExpression; //set the initial definition expression
+                    dynamicLayer.setLayerDefinitions(layerDefinitions); //apply the definition expression
+                }
+                map.addLayer(dynamicLayer);
+                return dynamicLayer;
             }
             
             function extentHistoryChangeHandler(){
@@ -315,15 +302,6 @@
                 //                map.showZoomSlider();
             }
             
-            //GETS THE EXTENT OF THE PASSED SPECIES USING A GP TASK - THIS HAS BEEN DEPRECATED - NOW USES AN SOE
-            function getExtent(spcID){
-                gp = new esri.tasks.Geoprocessor("http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/GetExtent/GPServer/Get%20Extent?token=" + token);
-                var params = {
-                    "ID_NO": spcID
-                };
-                gp.submitJob(params, jobCompleted);
-            }
-            
             //GETS THE EXTENT OF THE PASSED SPECIES USING A SOE
             function getExtent2(spcID){
                 esri.request({
@@ -344,19 +322,6 @@
                     },
                     error: esriConfig.defaults.io.errorHandler
                 });
-            }
-            
-            //AJAX RETURN CALL WITH THE EXTENT
-            function jobCompleted(jobInfo){
-                gp.getResultData(jobInfo.jobId, "Extent", extentReturned);
-            }
-            
-            //CONVERT THE AJAX OBJECT TO AN EXTENT AND SET THE MAPS EXTENT
-            function extentReturned(data){
-                var obj = dojo.fromJson(data.value);
-                var extent = new esri.geometry.Extent(obj);
-                map.setExtent(extent, true);
-                dojo.connect(rdbLayer, "onUpdate", hideLoading); //now we have zoomed to the extent, wire up the rdblayer update to hide the loading icon when it has finished updating
             }
             
             //DISABLE THE INTERACTIVITY IN THE OVERVIEW MAP
@@ -385,18 +350,6 @@
                 else {
                     symbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255, 0, 0]), 1);
                     extentMap.graphics.add(new esri.Graphic(polygon, symbol));//create a polygon that is the size and shape of the main map
-                }
-            }
-            
-            //CALLED WHEN THE USER CHANGES TABS
-            function changeTab(child){
-                if (child.id == 'speciesTab') {
-                    protectionLayer.hide();
-                    protectionLayer2.hide();
-                }
-                else {
-                    protectionLayer.show();
-                    protectionLayer2.show();
                 }
             }
             
@@ -483,15 +436,46 @@
                     }
                 });
             }
+            
+            function showTab(tabName){
+                var fadeInNode, fadeOutNode;
+                switch (tabName) {
+                    case "info":
+                        fadeInNode = dojo.byId("infoTab");
+                        fadeOutNode = dojo.byId("protectionTab")
+                        protectionLayer.hide();
+                        protectionLayer2.hide();
+                        break;
+                    case "protection":
+                        fadeInNode = dojo.byId("protectionTab");
+                        fadeOutNode = dojo.byId("infoTab")
+                        protectionLayer.show();
+                        protectionLayer2.show();
+                        break;
+                    default:
+                }
+                var fadeOut = dojo.fadeOut({
+                    node: fadeOutNode,
+                    duration: 150
+                });
+                fadeOut.play();
+                dojo.style(fadeOutNode, "display", "none");
+                dojo.style(fadeInNode, "display", "block");
+                var fadeIn = dojo.fadeIn({
+                    node: fadeInNode,
+                    duration: 150
+                });
+                fadeIn.play();
+            }
         </script>
     </head>
     <body class="claro">
         <div id="mainLoadingDiv" style="width:16px;left:50%;top:50%;position:absolute;z-index:100">
             <img src="images/loading.gif" alt="Loading image"/>
         </div>
-        <div dojotype="dijit.layout.BorderContainer" design="sidebar" id="borderContainer" gutters="false" style="opacity:0">
-            <div dojoType="dijit.layout.ContentPane" region="left" style="width:75%;height:100%">
-                <div id="navToolbar" dojoType="dijit.Toolbar" style="position:absolute;top:26px;z-index:100;left:35%;opacity:0.9">
+        <div dojotype="dijit.layout.BorderContainer" design="sidebar" id="borderContainer" gutters="false" style="opacity:0;padding:0px;position:absolute;left:10px;right:10px;top:10px;bottom:10px">
+            <div dojoType="dijit.layout.ContentPane" region="left" style="width:75%;padding:0px">
+                <div id="navToolbar" dojoType="dijit.Toolbar" style="position:absolute;top:6px;z-index:100;left:35%;opacity:0.9">
                     <div dojoType="dijit.form.Button" id="zoomin" iconClass="zoominIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_IN);">
                     </div>
                     <div dojoType="dijit.form.Button" id="zoomout" iconClass="zoomoutIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_OUT);">
@@ -507,33 +491,44 @@
                     <div dojoType="dijit.form.Button" id="deactivate" iconClass="deactivateIcon" onClick="navToolbar.deactivate()">
                     </div>
                 </div>
-                <div id="map" dojotype="dijit.layout.ContentPane" style="border:solid thin silver;margin-left:10px;margin-bottom:10px;margin-top:10px;clear:right;padding:0px">
+                <div id="map" dojotype="dijit.layout.ContentPane" style="border:solid thin silver;clear:right;padding:0px;">
                     <div id="loadingDiv" style="width:16px;left:50%;top:50%;position:absolute;z-index:100">
                         <img id="loadingImg" src="images/loading.gif" alt="Loading image"/>
                     </div>
                 </div>
             </div>
-            <div dojoType="dijit.layout.ContentPane" region="right" style="width:25%">
-                <div dojoType="dijit.layout.TabContainer" style="border:solid thin silver;margin:10px" id="tabs">
-                    <div dojoType="dijit.layout.ContentPane" title="Range" selected="true" id="speciesTab">
-                        <div dojotype="dijit.layout.BorderContainer" design="headline" gutters="false" style="width:100%; height: 100%;">
-                            <div dojoType="dijit.layout.ContentPane" region="top" style="width:100%;padding:0px">
-                                <div id="species">
-                                </div>
-                                <img id="statusImage" alt="statusImage" src="" class="paImage"><img src="http://i789.photobucket.com/albums/yy179/brezzy868792/orangutan.jpg" alt="Orang Utan Photo" style="width:200px;padding-left:3px"><img src="images/legend.png" style="margin:10px">
-                            </div>
-                            <div dojoType="dijit.layout.ContentPane" region="bottom" style="width:100%;padding:0px">
+            <div dojoType="dijit.layout.ContentPane" region="right" style="border-top:solid thin silver;border-bottom:solid thin silver;border-right:solid thin silver;width:25%;padding:0px;">
+                <div dojotype="dijit.layout.BorderContainer" design="sidebar" gutters="false" style="width:100%; height:100%;">
+                    <div dojoType="dijit.layout.ContentPane" region="top" style="height:85px;padding:0px">
+                        <!--Species header-->
+                        <div id="species">
+                        </div>
+                        <div style="width:100%;text-align:right">
+                            <ul class="tabUl">
+                                <li onclick="showTab('info')" class="tabLi">
+                                    Info
+                                </li>
+                                <li onclick="showTab('protection')" class="tabLi">
+                                    Protection
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div dojoType="dijit.layout.ContentPane" region="center">
+                        <!--Info/Protection content panel container-->
+                        <div dojotype="dijit.layout.BorderContainer" design="sidebar" gutters="false" style="width:100%;height:100%" id="infoTab">
+                            <!--Info Tab-->
+                            <div dojoType="dijit.layout.ContentPane" region="center" style="height:100%;padding:10px">
+                                <img id="statusImage" alt="statusImage" src="" class="paImage"/><img src="http://i789.photobucket.com/albums/yy179/brezzy868792/orangutan.jpg" class="paImage" alt="Orang Utan Photo" style="width:200px;"/><img src="images/legend.png" style="padding-left:2px;padding-top:10px;"/>
                                 <div id="extentMap" class="extentMap">
                                 </div>
-                                <div style="position:absolute;bottom:0;right:0;">
-                                    <img src="images/iucn.png" alt="IUCN Image" title="IUCN Redlist Website" onclick="window.open('http://www.iucnredlist.org/')" align="right" style="cursor:pointer;">
+                                <div dojoType="dijit.layout.ContentPane" region="bottom" style="padding:10px;">
+                                    <img src="images/iucn.png" alt="IUCN Image" title="IUCN Redlist Website" onclick="window.open('http://www.iucnredlist.org/')" style="cursor:pointer;">
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div dojoType="dijit.layout.ContentPane" title="Protection" id="protectionTab">
-                        <div dojotype="dijit.layout.BorderContainer" design="headline" gutters="false" style="width:100%; height: 100%;">
-                            <!--PROTECTION SECTION-->
+                        <div dojotype="dijit.layout.BorderContainer" design="sidebar" gutters="false" style="width:100%;height:100%" id="protectionTab">
+                            <!--Protection Tab-->
                             <div dojoType="dijit.layout.ContentPane" region="top" style="width:100%;padding:0px">
                                 <div style="color:#fefefe;font-size:25px;background-color:#333666;padding:10px">
                                     23.9%
@@ -544,7 +539,7 @@
                                 <div style="margin:10px;text-align:right">
                                     <img onclick="sortByPercentage()" src="images/desc.png" alt="Sort image" id="sortImage" title="Sort by percentage">
                                 </div>
-                            </div><!--PA LIST SECTION-->
+                            </div>
                             <div dojoType="dijit.layout.ContentPane" region="center" style="padding:0px;border-bottom:1px solid #cccccc" id="paTemplate" class="paList">
                                 <ul>
                                     <li data-template data-if-attributes.pa_image="notnull" style="display:none">
@@ -562,7 +557,6 @@
                                     </li>
                                 </ul>
                             </div>
-                            <!--FOOTER-->
                             <div dojoType="dijit.layout.ContentPane" region="bottom" style="width:100%;padding:0px;margin-top:20px">
                                 <div style="text-align:right">
                                     <img src="images/ppe.jpg" alt="Protected Planet Logo" onclick="window.open('http://www.protectedplanet.net/')" alt="ProtectedPlanet.net Website" style="cursor: pointer" title="ProtectedPlanet.net Website"/>

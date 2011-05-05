@@ -1,13 +1,12 @@
 .extentMap {
     width: 200px;
     height: 200px;
-    padding-left: 5px;
-    padding-bottom: 10px;
+    padding-left: 2px;
+    padding-top: 10px;
 }
 
 .paImage {
     float: left;
-    margin: 7px 7px 5px 2px;
     border: 1px solid #ccc;
 }
 
@@ -92,13 +91,12 @@
 }
 
 .Status {
-    padding: 7px;
-    margin-top:10px;
-    margin-bottom:10px;
     font: menu;
     font-size: 22px;
     opacity: 0.8;
-    border-bottom:2px solid #345678;
+    border-bottom:1px solid white;
+    text-align:center;
+    background-image:url("images/text1.jpg");
 }
 
 .EX {
@@ -134,4 +132,18 @@
 .LC {
     background-color: #006666;
     color: #FFFFFF;
+}
+.tabUl{
+  background-color:#345678;
+  style="list-style-type:none";
+  margin:0px;
+  padding:0px;
+}
+.tabLi{
+  display:inline;
+  background-color:red;
+  font-size:20px;
+  color:white;
+  padding:2px;
+  text-shadow:0px 1px 0px black;
 }
