@@ -1,8 +1,213 @@
-.extentMap {
+html, body {
+    height: 97%;
+    width: 98%;
+    margin: 1% 1% 2%;
+    padding: 0;
+}
+
+body {
+    background-color: #FFF;
+    color: #333;
+    font-size: 14px;
+    overflow: hidden;
+    font-family: "Helvetica Neue", Helvetica, "Trebuchet MS", Arial, sans-serif;
+}
+
+a {
+    color: #369;
+}
+
+#header {
+    border: solid 1px #999;
+    height: 60px;
+    background: url(../images/chrome_headerbg.png) #969696 repeat-x;
+    -webkit-border-top-left-radius: 4px;
+    -webkit-border-top-right-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    -moz-border-radius-topright: 4px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    margin: 0;
+}
+
+#species {
+    color: #555;
+    font-size: 30px;
+    text-align: left;
+    font-weight: bolder;
+    text-shadow: 0 1px 0 #EEE;
+    padding-top: 10px;
+    padding-left: 15px;
+}
+
+#subtitle {
+    font-size: 14px;
+    color: #444;
+    padding-left: 15px;
+}
+
+#mainLoadingDiv {
+    width: 16px;
+    left: 50%;
+    top: 50%;
+    position: absolute;
+    z-index: 100;
+}
+
+#navToolbar {
+    position: absolute;
+    top: 6px;
+    z-index: 100;
+    left: 35%;
+    opacity: 0.9;
+}
+
+#totalPercent {
+    color: #fefefe;
+    font-size: 25px;
+    background-color: #333666;
+    padding: 10px;
+}
+
+#totalPercentText {
+    color: #fefefe;
+    font-size: 13px;
+    background-color: #333666;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+}
+
+#sortDiv {
+    color: #fefefe;
+    font-size: 13px;
+    background-color: #333666;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px
+}
+
+.pane {
+    background-color: #dae4ef;
+    border-left: solid 1px #999;
+    margin: 0;
+    padding: 0;
+}
+
+.paneContent {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.paneHeader {
+    background: url(../images/chrome_leftheaderbg.png) repeat-x;
+    border-bottom: solid 1px #999;
+    color: #FFF;
+    height: 28px;
+    font-size: 18px;
+    line-height: 26px;
+    margin: 0;
+    padding: 10px 10px 10px 15px;
+}
+
+.paneBody {
+    margin: 0;
+}
+
+.paneBody .panel_content {
+    padding: 10px;
+    height: 100%;
+    width: 100%;
+}
+
+.paneTitle {
+    padding-left: 14px;
+}
+
+#rightPane {
+    width: 330px;
+    border-right-color: #999;
+    border-right-style: solid;
+    border-right-width: 1px;
+}
+
+#map {
+    border-left: solid 1px #999;
+    border-right: solid 1px #999;
+    margin: 0;
+}
+
+#footer {
+    font-size: 12px;
+    border: solid 1px #999;
+    background: url(../images/chrome_headerbg.png) #9b9b9b repeat-x;
+    -webkit-border-bottom-left-radius: 4px;
+    -webkit-border-bottom-right-radius: 4px;
+    -moz-border-radius-bottomleft: 4px;
+    -moz-border-radius-bottomright: 4px;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    text-align: right;
+    height: 18px;
+    margin: 0;
+    padding: 10px 15px 5px;
+}
+
+.esriScalebar {
+    padding-left: 15px;
+}
+
+.map .bingLogo-lg {
+    left: 18px !important;
+}
+
+.zoominIcon {
+    background-image: url(../images/nav_zoomin.png);
+    width: 25px;
+    height: 25px;
+}
+
+.zoomoutIcon {
+    background-image: url(../images/nav_zoomout.png);
+    width: 25px;
+    height: 25px;
+}
+
+.zoomfullextIcon {
+    background-image: url(../nav_fullextent.png);
+    width: 25px;
+    height: 25px;
+}
+
+.zoomprevIcon {
+    background-image: url(../images/nav_previous.png);
+    width: 25px;
+    height: 25px;
+}
+
+.zoomnextIcon {
+    background-image: url(../images/nav_next.png);
+    width: 25px;
+    height: 25px;
+}
+
+.panIcon {
+    background-image: url(../images/nav_pan.png);
+    width: 25px;
+    height: 25px;
+}
+
+.deactivateIcon {
+    background-image: url(../images/nav_cancel.png);
+    width: 25px;
+    height: 25px;
+}
+
+#extentMap {
     width: 200px;
     height: 200px;
-    padding-left: 2px;
-    padding-top: 10px;
 }
 
 .paImage {
@@ -88,72 +293,6 @@
    overflow-x:hidden;
    overflow-y:hidden;
    padding:2px 5px;
-}
-.speciesTop{
-    color: #555;
-    text-shadow: #EEE 0px 1px 0px;
-    font-family: 'Helvetica Neue', Helvetica, 'Trebuchet MS', Arial, sans-serif;
-    font-size: 30px;
-    font-weight:bold;
-    border-bottom:1px solid white;
-    text-align:center;
-    height: 40px;
-    padding:
-    0px;
-    background-attachment: scroll;
-    background-clip: border-box;
-    background-color:
-    #969696;
-    background-image:
-    url(http://www.arcgis.com/home/webmap/templates/Editor/Chrome/images/chrome_headerbg.png);
-    background-origin: padding-box;
-    border-bottom-color:
-    #999;
-    border-bottom-style: solid;
-    border-bottom-width:
-    1px;
-    border-left-color:
-    #999;
-    border-left-style: solid;
-    border-left-width:
-    1px;
-    border-right-color:
-    #999;
-    border-right-style: solid;
-    border-right-width:
-    1px;
-    border-top-color:
-    #999;
-    border-top-left-radius:
-    4px;
-    border-top-right-radius:
-    4px;
-    border-top-style: solid;
-    border-top-width:
-    1px;
-
-}
-.footer{
-  background-attachment: scroll;
-  background-clip: border-box;
-  background-color: #9B9B9B;
-  background-image: url(http://www.arcgis.com/home/webmap/templates/Editor/Chrome/images/chrome_headerbg.png);
-  background-origin: padding-box;
-  border-bottom-color: #999;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-  border-left-color: #999;
-  border-left-style: solid;
-  border-left-width: 1px;
-  border-right-color: #999;
-  border-right-style: solid;
-  border-right-width: 1px;
-  border-top-color: #999;
-  border-top-style: solid;
-  border-top-width: 1px;
-  color: #333;
 }
 .EX {
     background-color: #000000;
