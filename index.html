@@ -254,6 +254,7 @@
                 getProtectedAreas();
                 navToolbar = new esri.toolbars.Navigation(map);
                 dojo.connect(navToolbar, "onExtentHistoryChange", extentHistoryChangeHandler);
+                dojo.connect(dijit.byId('map'), 'resize', resizeMap);
                 showTab("info");
             }
             
@@ -276,6 +277,17 @@
             function extentHistoryChangeHandler(){
                 dijit.byId("zoomprev").disabled = navToolbar.isFirstExtent();
                 dijit.byId("zoomnext").disabled = navToolbar.isLastExtent();
+            }
+            
+            function resizeMap(){
+                //resize the map when the browser resizes - view the 'Resizing and repositioning the map' section in 
+                //the following help topic for more details http://help.esri.com/EN/webapi/javascript/arcgis/help/jshelp_start.htm#jshelp/inside_guidelines.htm
+                var resizeTimer;
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function(){
+                    map.resize();
+                    map.reposition();
+                }, 500);
             }
             
             //GETS THE SPECIES ID FROM THE QUERYSTRING
@@ -368,7 +380,8 @@
                 if (results.features.length > 0) {
                     var featureAttributes = results.features[0].attributes; //get the attributes of any features returned
                     dojo.byId("species").innerHTML = "<i>" + featureAttributes["friendly_name"] + "</i>"; //set the text in the UI
-                    dojo.attr(dojo.byId("species"), "class", "Status " + featureAttributes["rl_category"]);
+                    //                    dojo.attr(dojo.byId("species"), "class", "Status " + featureAttributes["rl_category"]);
+                    dojo.attr(dojo.byId("species"), "class", "Status");
                     dojo.doc.title = featureAttributes["friendly_name"]; //set the document title
                     dojo.byId("statusImage").src = "images/200px-Status_iucn3.1_" + featureAttributes["rl_category"] + ".svg.png";
                     var fadeOut = dojo.fadeOut({
@@ -473,8 +486,12 @@
         <div id="mainLoadingDiv" style="width:16px;left:50%;top:50%;position:absolute;z-index:100">
             <img src="images/loading.gif" alt="Loading image"/>
         </div>
-        <div dojotype="dijit.layout.BorderContainer" design="sidebar" id="borderContainer" gutters="false" style="opacity:0;padding:0px;position:absolute;left:10px;right:10px;top:10px;bottom:10px">
-            <div dojoType="dijit.layout.ContentPane" region="left" style="width:75%;padding:0px">
+        <div dojotype="dijit.layout.BorderContainer" design="headline" id="borderContainer" gutters="false" style="opacity:0;position:absolute;left:10px;right:10px;top:10px;bottom:10px">
+            <div dojoType="dijit.layout.ContentPane" region="top" class="speciesTop">
+                <div id="species">
+                </div>
+            </div>
+            <div dojoType="dijit.layout.ContentPane" region="center" style="width:75%;padding:0px">
                 <div id="navToolbar" dojoType="dijit.Toolbar" style="position:absolute;top:6px;z-index:100;left:35%;opacity:0.9">
                     <div dojoType="dijit.form.Button" id="zoomin" iconClass="zoominIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_IN);">
                     </div>
@@ -498,11 +515,8 @@
                 </div>
             </div>
             <div dojoType="dijit.layout.ContentPane" region="right" style="border-top:solid thin silver;border-bottom:solid thin silver;border-right:solid thin silver;width:25%;padding:0px;">
-                <div dojotype="dijit.layout.BorderContainer" design="sidebar" gutters="false" style="width:100%; height:100%;">
-                    <div dojoType="dijit.layout.ContentPane" region="top" style="height:85px;padding:0px">
-                        <!--Species header-->
-                        <div id="species">
-                        </div>
+                <div dojotype="dijit.layout.BorderContainer" design="headline" gutters="false" style="width:100%; height:100%;">
+                    <div dojoType="dijit.layout.ContentPane" region="top" style="padding:0px">
                         <div style="width:100%;text-align:right">
                             <ul class="tabUl">
                                 <li onclick="showTab('info')" class="tabLi">
@@ -529,7 +543,7 @@
                         </div>
                         <div dojotype="dijit.layout.BorderContainer" design="sidebar" gutters="false" style="width:100%;height:100%" id="protectionTab">
                             <!--Protection Tab-->
-                            <div dojoType="dijit.layout.ContentPane" region="top" style="width:100%;padding:0px">
+                            <div dojoType="dijit.layout.ContentPane" region="top" style="width:100%">
                                 <div style="color:#fefefe;font-size:25px;background-color:#333666;padding:10px">
                                     23.9%
                                 </div>
@@ -568,6 +582,8 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div dojoType="dijit.layout.ContentPane" region="bottom" class="footer">
             </div>
         </div>
     </body>

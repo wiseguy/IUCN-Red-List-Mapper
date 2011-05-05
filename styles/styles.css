@@ -89,49 +89,98 @@
    overflow-y:hidden;
    padding:2px 5px;
 }
-
-.Status {
-    font: menu;
-    font-size: 22px;
-    opacity: 0.8;
+.speciesTop{
+    color: #555;
+    text-shadow: #EEE 0px 1px 0px;
+    font-family: 'Helvetica Neue', Helvetica, 'Trebuchet MS', Arial, sans-serif;
+    font-size: 30px;
+    font-weight:bold;
     border-bottom:1px solid white;
     text-align:center;
-    background-image:url("images/text1.jpg");
-}
+    height: 40px;
+    padding:
+    0px;
+    background-attachment: scroll;
+    background-clip: border-box;
+    background-color:
+    #969696;
+    background-image:
+    url(http://www.arcgis.com/home/webmap/templates/Editor/Chrome/images/chrome_headerbg.png);
+    background-origin: padding-box;
+    border-bottom-color:
+    #999;
+    border-bottom-style: solid;
+    border-bottom-width:
+    1px;
+    border-left-color:
+    #999;
+    border-left-style: solid;
+    border-left-width:
+    1px;
+    border-right-color:
+    #999;
+    border-right-style: solid;
+    border-right-width:
+    1px;
+    border-top-color:
+    #999;
+    border-top-left-radius:
+    4px;
+    border-top-right-radius:
+    4px;
+    border-top-style: solid;
+    border-top-width:
+    1px;
 
+}
+.footer{
+  background-attachment: scroll;
+  background-clip: border-box;
+  background-color: #9B9B9B;
+  background-image: url(http://www.arcgis.com/home/webmap/templates/Editor/Chrome/images/chrome_headerbg.png);
+  background-origin: padding-box;
+  border-bottom-color: #999;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-left-color: #999;
+  border-left-style: solid;
+  border-left-width: 1px;
+  border-right-color: #999;
+  border-right-style: solid;
+  border-right-width: 1px;
+  border-top-color: #999;
+  border-top-style: solid;
+  border-top-width: 1px;
+  color: #333;
+}
 .EX {
     background-color: #000000;
-    color: #902424;
 }
 
 .EW {
     background-color: #000000;
-    color: #FFFFFF;
 }
 
 .CR {
     background-color: #cc3333;
-    color: #FFFFFF;
 }
 
 .EN {
     background-color: #cc6633;
-    color: #FFFFFF;
 }
 
 .VU {
     background-color: #cc9900;
-    color: #FFFFFF;
 }
 
 .NT {
     background-color: #006666;
-    color: #FFFFFF;
 }
 
 .LC {
     background-color: #006666;
-    color: #FFFFFF;
 }
 .tabUl{
   background-color:#345678;
