@@ -1,7 +1,7 @@
 html, body {
-    height: 97%;
-    width: 98%;
-    margin: 1% 1% 2%;
+    height: 98%;
+    width: 99%;
+    margin: 0.5% 0.5% 0.5% 0.5%;
     padding: 0;
 }
 
@@ -66,7 +66,7 @@ a {
     color: #fefefe;
     font-size: 25px;
     background-color: #333666;
-    padding: 10px;
+    padding: 10px 10px 0px 10px;
 }
 
 #totalPercentText {
@@ -81,10 +81,8 @@ a {
 #sortDiv {
     color: #fefefe;
     font-size: 13px;
-    background-color: #333666;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-bottom: 10px
+    float:right;
+    padding:5px;
 }
 
 .pane {
@@ -105,9 +103,9 @@ a {
     background: url(../images/chrome_leftheaderbg.png) repeat-x;
     border-bottom: solid 1px #999;
     color: #FFF;
-    height: 28px;
+    height: 38px;
     font-size: 18px;
-    line-height: 26px;
+    line-height: 38px;
     margin: 0;
     padding: 10px 10px 10px 15px;
 }
@@ -124,6 +122,12 @@ a {
 
 .paneTitle {
     padding-left: 14px;
+    padding-right: 14px;
+}
+
+.paneTitle:hover {
+    color: #CC6633;
+    cursor: pointer;
 }
 
 #rightPane {
@@ -176,7 +180,7 @@ a {
 }
 
 .zoomfullextIcon {
-    background-image: url(../nav_fullextent.png);
+    background-image: url(../images/nav_fullextent.png);
     width: 25px;
     height: 25px;
 }
@@ -205,14 +209,38 @@ a {
     height: 25px;
 }
 
+#statusImage {
+    border: 1px solid #ccc;
+    margin: 10px;
+}
+
+#speciesImage {
+    border: 1px solid #ccc;
+    margin-left: 10px;
+    padding: 3px;
+    background-color: white;
+    width: 180px;
+}
+
+#legend {
+    margin: 10px;
+}
+
 #extentMap {
     width: 200px;
     height: 200px;
+    float: left;
+    margin: 10px;
+    border: 1px solid #ccc;
+    background-color: white;
+    padding: 3px;
 }
 
-.paImage {
-    float: left;
-    border: 1px solid #ccc;
+#iucnImage {
+    cursor: pointer;
+    position: absolute;
+    bottom: 10px;
+    right: 10px
 }
 
 .paName {
@@ -240,6 +268,23 @@ a {
     width: 32px;
     text-align: center;
     opacity: 0.9;
+}
+
+.legendItem {
+    margin: 3px;
+}
+
+.legendItemSymbol {
+    background-color: #CC3333;
+    border: 1px solid #cccccc;
+    float: left;
+    width: 28px;
+    height: 15px;
+}
+
+.legendItemText {
+    margin-left: 38px;
+    font-size: 13px;
 }
 
 .paPercent:hover {

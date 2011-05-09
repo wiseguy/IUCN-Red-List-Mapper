@@ -23,7 +23,7 @@
             dojo.require("esri.toolbars.navigation");
             dojo.require("dijit.form.Button");
             dojo.require("dijit.Toolbar");
-            dojo.require("dijit.dijit"); 
+            dojo.require("dijit.dijit");
             dojo.require("esri.dijit.Scalebar");
             dojo.require("esri.map");
             dojo.declare("CloudMadeLayer", esri.layers.TiledMapServiceLayer, {
@@ -460,11 +460,19 @@
                         <div dojotype="dijit.layout.BorderContainer" design="sidebar" gutters="false" style="width:100%;height:100%" id="infoTab">
                             <!--Info Tab-->
                             <div dojoType="dijit.layout.ContentPane" region="center">
-                                <img id="statusImage" alt="statusImage" src="" class="paImage"/><img src="http://i789.photobucket.com/albums/yy179/brezzy868792/orangutan.jpg" alt="Orang Utan Photo" style="width:200px;"/><img src="images/legend.png"/>
+                                <img id="statusImage" title="Threatened" src=""/><img id="speciesImage" src="http://i789.photobucket.com/albums/yy179/brezzy868792/orangutan.jpg" title="Image of Orang Utan"/>
+                                <div id="legend">Legend:
+                                    <div class="legendItem">
+                                      <div class="legendItemSymbol"></div>
+                                      <div class="legendItemText">Native (resident)</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div dojoType="dijit.layout.ContentPane" region="bottom">
                                 <div id="extentMap">
                                 </div>
-                                <div dojoType="dijit.layout.ContentPane" region="bottom">
-                                    <img src="images/iucn.png" alt="IUCN Image" title="IUCN Redlist Website" onclick="window.open('http://www.iucnredlist.org/')" style="cursor:pointer;">
+                                <div id="iucnImage">
+                                    <img src="images/iucn.png" alt="IUCN Image" title="IUCN Redlist Website" onclick="window.open('http://www.iucnredlist.org/')">
                                 </div>
                             </div>
                         </div>
@@ -478,7 +486,7 @@
                                     of the species range lies within protected areas
                                 </div>
                                 <div id="sortDiv">
-                                    <img onclick="sortByPercentage()" src="images/desc.png" alt="Sort image" id="sortImage" title="Sort by percentage">
+                                    <img onclick="sortByPercentage()" src="images/desc.png" title="Click to sort by percentage" id="sortImage" title="Sort by percentage">
                                 </div>
                             </div>
                             <div dojoType="dijit.layout.ContentPane" region="center" style="padding:0px;border-bottom:1px solid #cccccc" id="paTemplate" class="paList">
