@@ -330,10 +330,12 @@
             function showResults(results){
                 if (results.features.length > 0) {
                     var featureAttributes = results.features[0].attributes; //get the attributes of any features returned
-                    dojo.byId("species").innerHTML = "<i>" + featureAttributes["friendly_name"] + "</i>"; //set the text in the UI
-                    //                    dojo.attr(dojo.byId("species"), "class", "Status " + featureAttributes["rl_category"]);
-                    dojo.attr(dojo.byId("species"), "class", "Status");
-                    dojo.doc.title = featureAttributes["friendly_name"]; //set the document title
+                    var taxon = featureAttributes["friendly_name"];
+                    getSpeciesData(taxon);
+                    dojo.byId("species").innerHTML = "<i>" + taxon + "</i>"; //set the text in the UI
+                    //                    dojo.attr(dojo.byId("species"), "class", "Status " + taxon);
+                    //                    dojo.attr(dojo.byId("species"), "class", "Status");
+                    dojo.doc.title = taxon; //set the document title
                     dojo.byId("statusImage").src = "images/200px-Status_iucn3.1_" + featureAttributes["rl_category"] + ".svg.png";
                     var fadeOut = dojo.fadeOut({
                         node: "mainLoadingDiv",
@@ -349,6 +351,29 @@
                 else {
                     dojo.byId("title").innerHTML = "No species found";
                 }
+            }
+            
+            //CALLS THE RED LIST API TO GET THE SPECIES DATA
+            function getSpeciesData(taxon){
+                var spName = taxon.replace(" ", "-");
+                dojo.io.script.get({
+                    url: "http://api.iucnredlist.org/index/species/" + spName + ".js?callback=parseSpeciesData"
+                });
+            }
+            
+            //ASYNCHRONOUS RETURN FOR THE RED LIST API CALL
+            function parseSpeciesData(data){
+                var species = data[0];
+                dojo.byId("spClass").innerHTML = capitaliseFirstLetter(species['class']);
+                dojo.byId("spOrder").innerHTML = capitaliseFirstLetter(species['order']);
+                dojo.byId("spFamily").innerHTML = capitaliseFirstLetter(species['family']);
+                dojo.byId("spGenus").innerHTML = capitaliseFirstLetter(species['genus']);
+                dojo.byId("spAuthority").innerHTML = capitaliseFirstLetter(species['authority']);
+                dojo.byId("spCategory").innerHTML = capitaliseFirstLetter(species['category']);
+            }
+            
+            function capitaliseFirstLetter(word){
+                return word.substr(0, 1).toUpperCase() + word.substr(1, word.length - 1).toLowerCase();
             }
             
             //FUNCTION TO RETRIEVE ALL OF THE PROTECTED AREAS INFORMATION FOR THE SPECIES
@@ -440,11 +465,16 @@
         <div id="mainWindow" dojotype="dijit.layout.BorderContainer" design="headline" gutters="false" style="width:100%; height:100%;opacity:0">
             <!-- Header Section-->
             <div id="header" dojotype="dijit.layout.ContentPane" region="top">
-                <div id="species">
+                <div id="taxonHierarchy">
+                    <span id="spClass"></span>
+                    | <span id="spOrder"></span>
+                    | <span id="spFamily"></span>
+                    | <span id="spGenus"></span>
+                    |
                 </div>
-                <div id="subtitle">
-                </div>
-                <div id="header_flourish">
+                <div>
+                    <span id="species" class="status"></span>
+                    <span id="spAuthority"></span>
                 </div>
             </div>
             <!-- Right Sidebar Section-->
@@ -461,10 +491,14 @@
                             <!--Info Tab-->
                             <div dojoType="dijit.layout.ContentPane" region="center">
                                 <img id="statusImage" title="Threatened" src=""/><img id="speciesImage" src="http://i789.photobucket.com/albums/yy179/brezzy868792/orangutan.jpg" title="Image of Orang Utan"/>
-                                <div id="legend">Legend:
+                                <div id="legend">
+                                    Legend:
                                     <div class="legendItem">
-                                      <div class="legendItemSymbol"></div>
-                                      <div class="legendItemText">Native (resident)</div>
+                                        <div class="legendItemSymbol">
+                                        </div>
+                                        <div class="legendItemText">
+                                            Native (resident)
+                                        </div>
                                     </div>
                                 </div>
                             </div>
