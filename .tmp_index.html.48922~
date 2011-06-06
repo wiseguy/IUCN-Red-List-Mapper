@@ -24,11 +24,7 @@
             dojo.require("dijit.form.Button");
             dojo.require("dijit.Toolbar");
             dojo.require("dijit.dijit");
-            dojo.require("dijit.form.Button");
-            dojo.require("esri.dijit.BasemapGallery");
             dojo.require("esri.dijit.Scalebar");
-            dojo.require("dijit.TitlePane");
-            dojo.require("dojo.window");
             dojo.require("esri.map");
             var map, extentMap, renderer, navToolbar;
             var layerDefinitions = []; //used to filter the results for an individual species
@@ -62,37 +58,6 @@
                 navToolbar = new esri.toolbars.Navigation(map);
                 dojo.connect(navToolbar, "onExtentHistoryChange", extentHistoryChangeHandler);
                 dojo.connect(dijit.byId('map'), 'resize', resizeMap);
-                createBasemapGallery();
-            }
-            
-            function createBasemapGallery(){
-                //add the basemap gallery
-                var basemapGallery = new esri.dijit.BasemapGallery({
-                    map: map,
-                    bingMapsKey: "ApEtXt6OQmIxxBtaii01DEEG23Fx8OjcYrVFzWogoW96NcsjHsI6U8XjzdeG73RP"
-                }, "basemapGallery");
-                basemapGallery.startup();
-                //                dojo.connect(basemapGallery, "onSelectionChange", hideBasemapGallery);
-                dojo.connect(basemapGallery, "onError", function(msg){
-                    console.log(msg)
-                });
-            }
-            
-            function showBasemapGallery(){
-                var button = dojo.byId("basemapGalleryButton");
-                var coords = dojo.coords(button);
-                var div = dojo.byId("basemapGalleryDiv");
-                var windowBox = dojo.window.getBox();
-                var divHeightStr = div.style.height;
-                var divHeight = divHeightStr.substr(0, divHeightStr.length - 2);
-                div.style.right = (windowBox.w - coords.x) + "px";
-                div.style.top = Math.round((windowBox.h - divHeight) / 2) + "px";
-                div.style.visibility = "visible";
-            }
-            
-            function hideBasemapGallery(){
-                div = dojo.byId("basemapGalleryDiv");
-                div.style.visibility = "hidden";
             }
             
             function addDynamicLayer(layerID, url, definitionExpression, opacity){
@@ -114,6 +79,7 @@
             function extentHistoryChangeHandler(){
                 dijit.byId("zoomprev").disabled = navToolbar.isFirstExtent();
                 dijit.byId("zoomnext").disabled = navToolbar.isLastExtent();
+                
             }
             
             function resizeMap(){
@@ -140,9 +106,6 @@
                 div.style.visibility = "visible";
                 map.disableMapNavigation();
                 //                map.hideZoomSlider();
-               var scalebar = new esri.dijit.Scalebar({
-                    map: map
-                });
             }
             
             //HIDES THE LOADING IMAGE WHEN THE RDB LAYER IS LOADING
@@ -181,7 +144,7 @@
                 extentMap.disableKeyboardNavigation();
                 extentMap.disableMapNavigation();
                 extentMap.disablePan();
-             }
+            }
             
             //CALLED WHEN THE MAP EXTENT CHANGES AND DRAWS THE POLYGON ON THE OVERVIEW MAP
             function extentChanged(extent){
@@ -268,40 +231,7 @@
     </head>
     <body class="tundra">
         <div id="mainLoadingDiv">
-            <!--shows until the basemap is loaded--><img src="images/loading.gif" alt="Loading image"/>
-        </div>
-        <div id="mapDiv">
-            <!-- Map Section -->
-            <div id="navToolbar" dojoType="dijit.Toolbar">
-                <!--map toolbar-->
-                <div dojoType="dijit.form.Button" id="zoomin" iconClass="zoominIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_IN);">
-                </div>
-                <div dojoType="dijit.form.Button" id="zoomout" iconClass="zoomoutIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_OUT);">
-                </div>
-                <div dojoType="dijit.form.Button" id="zoomfullext" iconClass="zoomfullextIcon" onClick="navToolbar.zoomToFullExtent();">
-                </div>
-                <div dojoType="dijit.form.Button" id="zoomprev" iconClass="zoomprevIcon" onClick="navToolbar.zoomToPrevExtent();">
-                </div>
-                <div dojoType="dijit.form.Button" id="zoomnext" iconClass="zoomnextIcon" onClick="navToolbar.zoomToNextExtent();">
-                </div>
-                <div dojoType="dijit.form.Button" id="pan" iconClass="panIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.PAN);">
-                </div>
-                <div dojoType="dijit.form.Button" id="deactivate" iconClass="deactivateIcon" onClick="navToolbar.deactivate()">
-                </div>
-            </div>
-            <div id="map">
-                <!--map-->
-                <div id="loadingDiv" style="width:16px;left:50%;top:50%;position:absolute;z-index:100">
-                    <!--shows while the extent for the species is being retrieved--><img id="loadingImg" src="images/loading.gif" alt="Loading image"/>
-                </div>
-                <div dojoType="dijit.layout.ContentPane" id="basemapGalleryDiv" style="width:366px;height:490px">
-                    <div id="basemapGallery">
-                    </div>
-                    <button dojoType="dijit.form.Button" onclick="hideBasemapGallery()">
-                        OK
-                    </button>
-                </div>
-            </div>
+            <img src="images/loading.gif" alt="Loading image"/>
         </div>
         <div id="mainWindow" dojotype="dijit.layout.BorderContainer" design="headline" gutters="false" style="width:100%; height:100%;opacity:0">
             <!-- Right Sidebar Section-->
@@ -339,9 +269,6 @@
                                 </div>
                             </div>
                             <div dojoType="dijit.layout.ContentPane" region="bottom">
-                                <button dojoType="dijit.form.Button" onclick="showBasemapGallery()" id="basemapGalleryButton">
-                                    Click to open basemap gallery
-                                </button>
                                 <div id="extentMap">
                                 </div>
                                 <div id="iucnImage">
@@ -349,13 +276,37 @@
                                 </div>
                             </div>
                         </div>
-                    </div><!--Sidebar Bottom--><!--Panel bottom-->
+                    </div><!--Sidebar Bottom-->
+                    <!--Panel bottom-->
                     <div id="footer" dojotype="dijit.layout.ContentPane" region="bottom">
                         Published by IUCN<span id="owner"></span>
                     </div>
                 </div>
             </div>
-            <!-- Footer Section-->
+            <!-- Map Section -->
+            <div dojotype="dijit.layout.ContentPane" region="center">
+                <div id="navToolbar" dojoType="dijit.Toolbar">
+                    <div dojoType="dijit.form.Button" id="zoomin" iconClass="zoominIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_IN);">
+                    </div>
+                    <div dojoType="dijit.form.Button" id="zoomout" iconClass="zoomoutIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_OUT);">
+                    </div>
+                    <div dojoType="dijit.form.Button" id="zoomfullext" iconClass="zoomfullextIcon" onClick="navToolbar.zoomToFullExtent();">
+                    </div>
+                    <div dojoType="dijit.form.Button" id="zoomprev" iconClass="zoomprevIcon" onClick="navToolbar.zoomToPrevExtent();">
+                    </div>
+                    <div dojoType="dijit.form.Button" id="zoomnext" iconClass="zoomnextIcon" onClick="navToolbar.zoomToNextExtent();">
+                    </div>
+                    <div dojoType="dijit.form.Button" id="pan" iconClass="panIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.PAN);">
+                    </div>
+                    <div dojoType="dijit.form.Button" id="deactivate" iconClass="deactivateIcon" onClick="navToolbar.deactivate()">
+                    </div>
+                </div>
+                <div id="map" dojotype="dijit.layout.ContentPane">
+                    <div id="loadingDiv" style="width:16px;left:50%;top:50%;position:absolute;z-index:100">
+                        <img id="loadingImg" src="images/loading.gif" alt="Loading image"/>
+                    </div>
+                </div>
+            </div><!-- Footer Section-->
         </div>
     </body>
 </html>

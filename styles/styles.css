@@ -8,7 +8,7 @@ html, body {
 body {
     background-color: #FFF;
     color: #333;
-    font-size: 14px;
+    font-size: 12px;
     overflow: hidden;
     font-family: "Helvetica Neue", Helvetica, "Trebuchet MS", Arial, sans-serif;
 }
@@ -20,37 +20,39 @@ a {
 #header {
     border: solid 1px #999;
     height: 80px;
-    background: url(../images/chrome_headerbg.png) #969696 repeat-x;
+    background-color:#d6250d;
     -webkit-border-top-left-radius: 4px;
     -webkit-border-top-right-radius: 4px;
     -moz-border-radius-topleft: 4px;
     -moz-border-radius-topright: 4px;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-    border-top-
-    margin: 0;
+    border-top- margin: 0;
 }
-#taxonHierarchy{
-  padding:10px 10px 10px 15px;
-  color:#555;
+
+#taxonHierarchy {
+    padding: 10px 10px 10px 15px;
+    color: #FFF;
 }
 
 #species {
-    color: #555;
-    font-size: 30px;
+    color: #FFF;
+    font-size: 25px;
     text-align: left;
     font-weight: bolder;
-    text-shadow: 0 1px 0 #EEE;
+    text-shadow: 0 1px 0 #333;
     padding-left: 15px;
-    padding-bottom:7px;
-    line-height:17px;
+    padding-bottom: 7px;
+    line-height: 17px;
 }
-#spAuthority{
-  color:#555;
-  padding-left:10px;
+
+#spAuthority {
+    color: #FFF;
+    padding-left: 10px;
 }
+
 #subtitle {
-    font-size: 14px;
+    font-size: 10px;
     color: #444;
     padding-left: 15px;
 }
@@ -60,8 +62,9 @@ a {
     left: 50%;
     top: 50%;
     position: absolute;
-    z-index: 100;
+    z-index: 1000;
 }
+
 #mapDiv {
     width: 100%;
     height: 100%;
@@ -70,10 +73,12 @@ a {
     position: absolute;
     z-index: 1;
 }
-#map{
+
+#map {
     width: 100%;
     height: 100%;
 }
+
 #navToolbar {
     position: absolute;
     top: 6px;
@@ -83,9 +88,12 @@ a {
 }
 
 .pane {
-    background-color: #dae4ef;
+    background-color: #ffffff;
     margin: 0;
     padding: 0;
+    opacity: 0.96;
+    border-left:solid 1px #999;
+    border-right:solid 1px #999;
 }
 
 .paneContent {
@@ -132,9 +140,9 @@ a {
 
 #footer {
     font-size: 12px;
-    color:#555;
+    color: #fff;
     border: solid 1px #999;
-    background: url(../images/chrome_headerbg.png) #9b9b9b repeat-x;
+    background-color:#d6250d;
     -webkit-border-bottom-left-radius: 4px;
     -webkit-border-bottom-right-radius: 4px;
     -moz-border-radius-bottomleft: 4px;
@@ -200,7 +208,7 @@ a {
 #statusImage {
     border: 1px solid #ccc;
     margin: 10px;
-    float:left;
+    float: left;
 }
 
 #speciesImage {
@@ -231,7 +239,6 @@ a {
     bottom: 10px;
     right: 10px
 }
-
 
 .legendItem {
     margin: 3px;
@@ -277,17 +284,21 @@ a {
 .LC {
     background-color: #006666;
 }
-.tabUl{
-  background-color:#345678;
-  style="list-style-type:none";
-  margin:0px;
-  padding:0px;
+
+.tabUl {
+    background-color: #345678;
+    style = "list-style-type:none";
+    margin:
+    0px;
+    padding:
+    0px;
 }
-.tabLi{
-  display:inline;
-  background-color:red;
-  font-size:20px;
-  color:white;
-  padding:2px;
-  text-shadow:0px 1px 0px black;
+
+#basemapGalleryDiv {
+    position: absolute;
+    z-Index: 999;
+    background-color: white;
+    overflow: auto;
+    visibility: hidden;
+    padding: 15px;
 }
