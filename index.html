@@ -48,6 +48,7 @@
                 dojo.connect(extentMap, "onLoad", loadExtentMap); //disable the map navigation controls for the extent map
                 dojo.connect(map, "onZoomStart", showLoading);
                 dojo.connect(map, "onPanStart", showLoading);
+                dojo.connect(map, "onExtentChange", extentChanged);
                 
                 //ADD THE DYNAMIC LAYERS TO THE MAP
                 var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer");
@@ -78,6 +79,7 @@
             function extentHistoryChangeHandler(){
                 dijit.byId("zoomprev").disabled = navToolbar.isFirstExtent();
                 dijit.byId("zoomnext").disabled = navToolbar.isLastExtent();
+                
             }
             
             function resizeMap(){
