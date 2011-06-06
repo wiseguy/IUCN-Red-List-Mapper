@@ -26,147 +26,7 @@
             dojo.require("dijit.dijit");
             dojo.require("esri.dijit.Scalebar");
             dojo.require("esri.map");
-            dojo.declare("CloudMadeLayer", esri.layers.TiledMapServiceLayer, {
-                size: 256,
-                styleid: 8,
-                apikey: "",
-                constructor: function(){
-                    this.spatialReference = new esri.SpatialReference({
-                        "wkid": 102113
-                    });
-                    
-                    //layer provides tile info                    
-                    this.tileInfo = new esri.layers.TileInfo({
-                        "rows": 256,
-                        "cols": 256,
-                        "dpi": 96,
-                        "format": "PNG8",
-                        "compressionQuality": 0,
-                        "origin": {
-                            "x": -20037508.342787,
-                            "y": 20037508.342787
-                        },
-                        "spatialReference": {
-                            "wkid": 102113
-                        },
-                        "lods": [{
-                            "level": 0,
-                            "scale": 591657527.591555,
-                            "resolution": 156543.033928
-                        }, {
-                            "level": 1,
-                            "scale": 295828763.795777,
-                            "resolution": 78271.5169639999
-                        }, {
-                            "level": 2,
-                            "scale": 147914381.897889,
-                            "resolution": 39135.7584820001
-                        }, {
-                            "level": 3,
-                            "scale": 73957190.948944,
-                            "resolution": 19567.8792409999
-                        }, {
-                            "level": 4,
-                            "scale": 36978595.474472,
-                            "resolution": 9783.93962049996
-                        }, {
-                            "level": 5,
-                            "scale": 18489297.737236,
-                            "resolution": 4891.96981024998
-                        }, {
-                            "level": 6,
-                            "scale": 9244648.868618,
-                            "resolution": 2445.98490512499
-                        }, {
-                            "level": 7,
-                            "scale": 4622324.434309,
-                            "resolution": 1222.99245256249
-                        }, {
-                            "level": 8,
-                            "scale": 2311162.217155,
-                            "resolution": 611.49622628138
-                        }, {
-                            "level": 9,
-                            "scale": 1155581.108577,
-                            "resolution": 305.748113140558
-                        }, {
-                            "level": 10,
-                            "scale": 577790.554289,
-                            "resolution": 152.874056570411
-                        }, {
-                            "level": 11,
-                            "scale": 288895.277144,
-                            "resolution": 76.4370282850732
-                        }, {
-                            "level": 12,
-                            "scale": 144447.638572,
-                            "resolution": 38.2185141425366
-                        }, {
-                            "level": 13,
-                            "scale": 72223.819286,
-                            "resolution": 19.1092570712683
-                        }, {
-                            "level": 14,
-                            "scale": 36111.909643,
-                            "resolution": 9.55462853563415
-                        }, {
-                            "level": 15,
-                            "scale": 18055.954822,
-                            "resolution": 4.77731426794937
-                        }, {
-                            "level": 16,
-                            "scale": 9027.977411,
-                            "resolution": 2.38865713397468
-                        }, {
-                            "level": 17,
-                            "scale": 4513.988705,
-                            "resolution": 1.19432856685505
-                        }, {
-                            "level": 18,
-                            "scale": 2256.994353,
-                            "resolution": 0.597164283559817
-                        }]
-                    });
-                    
-                    //layer provides initial extent & full extent.
-                    this.fullExtent = this.initialExtent = new esri.geometry.Extent({
-                        "xmin": -20037508.34,
-                        "ymin": -20037508.34,
-                        "xmax": 20037508.34,
-                        "ymax": 20037508.34,
-                        "spatialReference": {
-                            "wkid": 102113
-                        }
-                    });
-                    
-                    //custom layer properties for improving layer performance by retrieving tiled images from multiple servers
-                    this.servers = ["http://a.tile.cloudmade.com/", "http://b.tile.cloudmade.com/", "http://c.tile.cloudmade.com/"];
-                    this.serversLength = this.servers.length;
-                    this.serverIndex = 0;
-                },
-                setAPIKey: function(/*string*/){
-                    if (arguments[0]) {
-                        this.apikey = arguments[0];
-                        this.loaded = true;
-                        this.onLoad(this);
-                    }
-                    else {
-                        alert("No API key provided");
-                    }
-                    return this; //for chaining          
-                },
-                setStyle: function(/*int*/){
-                    this.styleid = 34085;// mine
-                    //                    this.styleid = 20760;//Gris=gris
-                },
-                getTileUrl: function(level, row, col){
-                    //implement abstract method and return url to cached tile based on level/row/column
-                    return this.servers[this.serverIndex++ % this.serversLength] + this.apikey + "/" + this.styleid + "/" + this.size + "/" + level + "/" + col + "/" + row + ".png";
-                }
-                
-            });
-            var map, protectionLayer, protectionLayer2, cmlayer, extentMap, renderer, protectedAreas, navToolbar;
-            var sortNumber = 1;
+            var map, extentMap, renderer, navToolbar;
             var layerDefinitions = []; //used to filter the results for an individual species
             dojo.addOnLoad(onLoad);
             
@@ -189,24 +49,14 @@
                 dojo.connect(map, "onZoomStart", showLoading);
                 dojo.connect(map, "onPanStart", showLoading);
                 
-                //CLOUD MADE LAYER FOR THE MAP
-                cmlayer = new CloudMadeLayer().setAPIKey("c77488293ca54a9cb28552018e1b540d"); //instantiate the cloud made layer
-                cmlayer.setStyle(); //set the style of the cloud made layer
-                map.addLayer(cmlayer); //add the cloud made layer to the map
-                dojo.connect(map, "onExtentChange", extentChanged); //wire the extent change event of the map to draw the polygon on the overview map
-                //                dojo.byId("copyright").innerHTML = "&nbsp;&copy; 2009 <a target=_blank href='http://cloudmade.com' tabindex=-1>CloudMade</a> - Map data <a target=_blank href='http://creativecommons.org/licenses/by-sa/2.0/' tabindex=-1>CCBYSA</a> 2009 <a target=_blank href='http://openstreetmap.org' tabindex=-1>OpenStreetMap.org</a> contributors - <a target=_blank href='http://cloudmade.com/terms_conditions' tabindex=-1>Terms of Use</a>&nbsp;";
-                
                 //ADD THE DYNAMIC LAYERS TO THE MAP
+                var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer");
+                map.addLayer(basemap);
+                
                 rdbLayer = addDynamicLayer(0, "http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer", "ID_NO='" + ID_NO + "'", 0.7);
-                protectionLayer = addDynamicLayer(1, "http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer", null, 0.7);
-                protectionLayer2 = addDynamicLayer(2, "http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer", null, 0.4);
-                protectionLayer2.hide();
-                protectionLayer.hide();
-                getProtectedAreas();
                 navToolbar = new esri.toolbars.Navigation(map);
                 dojo.connect(navToolbar, "onExtentHistoryChange", extentHistoryChangeHandler);
                 dojo.connect(dijit.byId('map'), 'resize', resizeMap);
-                showTab("info");
             }
             
             function addDynamicLayer(layerID, url, definitionExpression, opacity){
@@ -375,87 +225,6 @@
             function capitaliseFirstLetter(word){
                 return word.substr(0, 1).toUpperCase() + word.substr(1, word.length - 1).toLowerCase();
             }
-            
-            //FUNCTION TO RETRIEVE ALL OF THE PROTECTED AREAS INFORMATION FOR THE SPECIES
-            function getProtectedAreas(){
-                var queryTask = new esri.tasks.QueryTask("http://79.125.16.106/ArcGIS/rest/services/Andrew/MapperDemo/MapServer/1?token=" + token); //instantiate a querytask that will be used to get the protected area information
-                var query = new esri.tasks.Query(); //instantiate a query to filter the query task
-                query.returnGeometry = false;
-                query.outFields = ["wdpaid", "pa_name", "pa_image", "pa_type", "pa_percent", "pa_x", "pa_y"];
-                query.where = "objectID>-1";
-                queryTask.execute(query, showPAResults); //call the query to get the binomial
-            }
-            
-            function showPAResults(results){
-                renderer = Tempo.prepare("paTemplate");
-                protectedAreas = results.features;
-                sortByPercentage();
-            }
-            
-            function sortByPercentage(){
-                renderer.clear();
-                protectedAreas.sort(function(a, b){
-                    aNum = parseFloat(a.attributes.pa_percent);
-                    bNum = parseFloat(b.attributes.pa_percent);
-                    return (sortNumber * (bNum - aNum));
-                });
-                sortNumber = sortNumber * (-1);
-                //                renderer.append(protectedAreas.slice(0, 8)); //first 9 elements only
-                renderer.append(protectedAreas);
-                if (sortNumber == 1) {
-                    dojo.byId(sortImage).src = "images/asc.png";
-                }
-                else {
-                    dojo.byId(sortImage).src = "images/desc.png";
-                }
-            }
-            
-            function showPA(wdpaid){
-                map.graphics.clear();
-                dojo.forEach(protectedAreas, function(item, i){
-                    if (item.attributes.wdpaid == wdpaid) {
-                        var point = new esri.geometry.Point(item.attributes.pa_x, item.attributes.pa_y, new esri.SpatialReference({
-                            wkid: 4326
-                        }));
-                        var pointWM = esri.geometry.geographicToWebMercator(point);
-                        var font = new esri.symbol.Font("13px", esri.symbol.Font.STYLE_NORMAL, esri.symbol.Font.VARIANT_NORMAL, esri.symbol.Font.WEIGHT_NORMAL, "Lucida Grande");
-                        map.graphics.add(new esri.Graphic(pointWM, new esri.symbol.SimpleMarkerSymbol(esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE, 8)));
-                        map.graphics.add(new esri.Graphic(pointWM, new esri.symbol.TextSymbol(item.attributes.pa_name, font, "#333").setOffset(0, 10)));
-                        return;
-                    }
-                });
-            }
-            
-            function showTab(tabName){
-                var fadeInNode, fadeOutNode;
-                switch (tabName) {
-                    case "info":
-                        fadeInNode = dojo.byId("infoTab");
-                        fadeOutNode = dojo.byId("protectionTab")
-                        protectionLayer.hide();
-                        protectionLayer2.hide();
-                        break;
-                    case "protection":
-                        fadeInNode = dojo.byId("protectionTab");
-                        fadeOutNode = dojo.byId("infoTab")
-                        protectionLayer.show();
-                        protectionLayer2.show();
-                        break;
-                    default:
-                }
-                var fadeOut = dojo.fadeOut({
-                    node: fadeOutNode,
-                    duration: 150
-                });
-                fadeOut.play();
-                dojo.style(fadeOutNode, "display", "none");
-                dojo.style(fadeInNode, "display", "block");
-                var fadeIn = dojo.fadeIn({
-                    node: fadeInNode,
-                    duration: 150
-                });
-                fadeIn.play();
-            }
         </script>
     </head>
     <body class="tundra">
@@ -463,29 +232,24 @@
             <img src="images/loading.gif" alt="Loading image"/>
         </div>
         <div id="mainWindow" dojotype="dijit.layout.BorderContainer" design="headline" gutters="false" style="width:100%; height:100%;opacity:0">
-            <!-- Header Section-->
-            <div id="header" dojotype="dijit.layout.ContentPane" region="top">
-                <div id="taxonHierarchy">
-                    <span id="spClass"></span>
-                    | <span id="spOrder"></span>
-                    | <span id="spFamily"></span>
-                    | <span id="spGenus"></span>
-                    |
-                </div>
-                <div>
-                    <span id="species" class="status"></span>
-                    <span id="spAuthority"></span>
-                </div>
-            </div>
             <!-- Right Sidebar Section-->
             <div dojotype="dijit.layout.ContentPane" id="rightPane" class="pane" region="right">
                 <div class="paneContent" dojotype="dijit.layout.BorderContainer" design="headline" gutters="false">
-                    <!--Sidebar Header-->
-                    <div class="paneHeader" dojotype="dijit.layout.ContentPane" region="top">
-                        <span class="paneTitle" onclick="showTab('info')">Range</span>
-                        <span class="paneTitle" onclick="showTab('protection')">Protection</span>
+                    <!--Panel Top-->
+                    <div id="header" dojotype="dijit.layout.ContentPane" region="top">
+                        <div id="taxonHierarchy">
+                            <span id="spClass"></span>
+                            | <span id="spOrder"></span>
+                            | <span id="spFamily"></span>
+                            | <span id="spGenus"></span>
+                            |
+                        </div>
+                        <div>
+                            <span id="species" class="status"></span>
+                            <span id="spAuthority"></span>
+                        </div>
                     </div>
-                    <!--Sidebar Content-->
+                    <!--Panel Center-->
                     <div dojotype="dijit.layout.ContentPane" region="center">
                         <div dojotype="dijit.layout.BorderContainer" design="sidebar" gutters="false" style="width:100%;height:100%" id="infoTab">
                             <!--Info Tab-->
@@ -510,45 +274,10 @@
                                 </div>
                             </div>
                         </div>
-                        <div dojotype="dijit.layout.BorderContainer" design="sidebar" gutters="false" style="width:100%;height:100%" id="protectionTab">
-                            <!--Protection Tab-->
-                            <div dojoType="dijit.layout.ContentPane" region="top">
-                                <div id="totalPercent">
-                                    23.9%
-                                </div>
-                                <div id="totalPercentText">
-                                    of the species range lies within protected areas
-                                </div>
-                                <div id="sortDiv">
-                                    <img onclick="sortByPercentage()" src="images/desc.png" title="Click to sort by percentage" id="sortImage" title="Sort by percentage">
-                                </div>
-                            </div>
-                            <div dojoType="dijit.layout.ContentPane" region="center" style="padding:0px;border-bottom:1px solid #cccccc" id="paTemplate" class="paList">
-                                <ul>
-                                    <li data-template data-if-attributes.pa_image="notnull" style="display:none">
-                                        <div onmouseover="showPA('{{attributes.wdpaid}}')" onclick="window.open('http://www.protectedplanet.net/sites/{{attributes.wdpaid}}')" class="paDiv">
-                                            <img src="{{attributes.pa_image}}" alt="PA Image" class="paImage"/>
-                                            <div class="paName">
-                                                {{attributes.pa_name}}
-                                                <br>
-                                                <span class="paType">{{attributes.pa_type}}</span>
-                                            </div>
-                                            <div class="paPercent">
-                                                <span class="paPercentText">{{attributes.pa_percent}}</span>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div dojoType="dijit.layout.ContentPane" region="bottom" style="width:100%;padding:0px;margin-top:20px">
-                                <div style="text-align:right">
-                                    <img src="images/ppe.jpg" alt="Protected Planet Logo" onclick="window.open('http://www.protectedplanet.net/')" alt="ProtectedPlanet.net Website" style="cursor: pointer" title="ProtectedPlanet.net Website"/>
-                                </div>
-                                <div class="paType" style="text-align:right">
-                                    Data provided by ProtectedPlanet
-                                </div>
-                            </div>
-                        </div>
+                    </div><!--Sidebar Bottom-->
+                    <!--Panel bottom-->
+                    <div id="footer" dojotype="dijit.layout.ContentPane" region="bottom">
+                        Published by IUCN<span id="owner"></span>
                     </div>
                 </div>
             </div>
@@ -576,9 +305,6 @@
                     </div>
                 </div>
             </div><!-- Footer Section-->
-            <div id="footer" dojotype="dijit.layout.ContentPane" region="bottom">
-                Published by IUCN | UNEP-WCMC<span id="owner"></span>
-            </div>
         </div>
     </body>
 </html>
