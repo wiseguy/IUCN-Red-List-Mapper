@@ -230,8 +230,31 @@
         </script>
     </head>
     <body class="tundra">
-        <div id="mainLoadingDiv">
+        <div id="mainLoadingDiv"> <!--shows until the basemap is loaded-->
             <img src="images/loading.gif" alt="Loading image"/>
+        </div>
+        <div id="mapDiv"><!-- Map Section -->
+            <div id="navToolbar" dojoType="dijit.Toolbar"> <!--map toolbar-->
+                <div dojoType="dijit.form.Button" id="zoomin" iconClass="zoominIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_IN);">
+                </div>
+                <div dojoType="dijit.form.Button" id="zoomout" iconClass="zoomoutIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_OUT);">
+                </div>
+                <div dojoType="dijit.form.Button" id="zoomfullext" iconClass="zoomfullextIcon" onClick="navToolbar.zoomToFullExtent();">
+                </div>
+                <div dojoType="dijit.form.Button" id="zoomprev" iconClass="zoomprevIcon" onClick="navToolbar.zoomToPrevExtent();">
+                </div>
+                <div dojoType="dijit.form.Button" id="zoomnext" iconClass="zoomnextIcon" onClick="navToolbar.zoomToNextExtent();">
+                </div>
+                <div dojoType="dijit.form.Button" id="pan" iconClass="panIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.PAN);">
+                </div>
+                <div dojoType="dijit.form.Button" id="deactivate" iconClass="deactivateIcon" onClick="navToolbar.deactivate()">
+                </div>
+            </div>
+            <div id="map"> <!--map-->
+                <div id="loadingDiv" style="width:16px;left:50%;top:50%;position:absolute;z-index:100"> <!--shows while the extent for the species is being retrieved-->
+                    <img id="loadingImg" src="images/loading.gif" alt="Loading image"/>
+                </div>
+            </div>
         </div>
         <div id="mainWindow" dojotype="dijit.layout.BorderContainer" design="headline" gutters="false" style="width:100%; height:100%;opacity:0">
             <!-- Right Sidebar Section-->
@@ -276,37 +299,13 @@
                                 </div>
                             </div>
                         </div>
-                    </div><!--Sidebar Bottom-->
-                    <!--Panel bottom-->
+                    </div><!--Sidebar Bottom--><!--Panel bottom-->
                     <div id="footer" dojotype="dijit.layout.ContentPane" region="bottom">
                         Published by IUCN<span id="owner"></span>
                     </div>
                 </div>
             </div>
-            <!-- Map Section -->
-            <div dojotype="dijit.layout.ContentPane" region="center">
-                <div id="navToolbar" dojoType="dijit.Toolbar">
-                    <div dojoType="dijit.form.Button" id="zoomin" iconClass="zoominIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_IN);">
-                    </div>
-                    <div dojoType="dijit.form.Button" id="zoomout" iconClass="zoomoutIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_OUT);">
-                    </div>
-                    <div dojoType="dijit.form.Button" id="zoomfullext" iconClass="zoomfullextIcon" onClick="navToolbar.zoomToFullExtent();">
-                    </div>
-                    <div dojoType="dijit.form.Button" id="zoomprev" iconClass="zoomprevIcon" onClick="navToolbar.zoomToPrevExtent();">
-                    </div>
-                    <div dojoType="dijit.form.Button" id="zoomnext" iconClass="zoomnextIcon" onClick="navToolbar.zoomToNextExtent();">
-                    </div>
-                    <div dojoType="dijit.form.Button" id="pan" iconClass="panIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.PAN);">
-                    </div>
-                    <div dojoType="dijit.form.Button" id="deactivate" iconClass="deactivateIcon" onClick="navToolbar.deactivate()">
-                    </div>
-                </div>
-                <div id="map" dojotype="dijit.layout.ContentPane">
-                    <div id="loadingDiv" style="width:16px;left:50%;top:50%;position:absolute;z-index:100">
-                        <img id="loadingImg" src="images/loading.gif" alt="Loading image"/>
-                    </div>
-                </div>
-            </div><!-- Footer Section-->
+            <!-- Footer Section-->
         </div>
     </body>
 </html>
