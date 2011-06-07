@@ -24,7 +24,11 @@
             dojo.require("dijit.form.Button");
             dojo.require("dijit.Toolbar");
             dojo.require("dijit.dijit");
+            dojo.require("dijit.form.Button");
+            dojo.require("esri.dijit.BasemapGallery");
             dojo.require("esri.dijit.Scalebar");
+            dojo.require("dijit.TitlePane");
+            dojo.require("dojo.window");
             dojo.require("esri.map");
             var map, extentMap, renderer, navToolbar;
             var layerDefinitions = []; //used to filter the results for an individual species
@@ -46,6 +50,7 @@
                 var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer");
                 extentMap.addLayer(basemap);
                 dojo.connect(extentMap, "onLoad", loadExtentMap); //disable the map navigation controls for the extent map
+                dojo.connect(map, "onLoad", createScaleBar);
                 dojo.connect(map, "onZoomStart", showLoading);
                 dojo.connect(map, "onPanStart", showLoading);
                 dojo.connect(map, "onExtentChange", extentChanged);
@@ -58,6 +63,43 @@
                 navToolbar = new esri.toolbars.Navigation(map);
                 dojo.connect(navToolbar, "onExtentHistoryChange", extentHistoryChangeHandler);
                 dojo.connect(dijit.byId('map'), 'resize', resizeMap);
+                createBasemapGallery();
+            }
+            
+            function createScaleBar(){
+                var scalebar = new esri.dijit.Scalebar({
+                    map: map
+                });
+            }
+            
+            function createBasemapGallery(){
+                //add the basemap gallery
+                var basemapGallery = new esri.dijit.BasemapGallery({
+                    map: map,
+                    bingMapsKey: "ApEtXt6OQmIxxBtaii01DEEG23Fx8OjcYrVFzWogoW96NcsjHsI6U8XjzdeG73RP"
+                }, "basemapGallery");
+                basemapGallery.startup();
+                //                dojo.connect(basemapGallery, "onSelectionChange", hideBasemapGallery);
+                dojo.connect(basemapGallery, "onError", function(msg){
+                    console.log(msg)
+                });
+            }
+            
+            function showBasemapGallery(){
+                var button = dojo.byId("basemapGalleryButton");
+                var coords = dojo.coords(button);
+                var div = dojo.byId("basemapGalleryDiv");
+                var windowBox = dojo.window.getBox();
+                var divHeightStr = div.style.height;
+                var divHeight = divHeightStr.substr(0, divHeightStr.length - 2);
+                div.style.right = (windowBox.w - coords.x) + "px";
+                div.style.top = Math.round((windowBox.h - divHeight) / 2) + "px";
+                div.style.visibility = "visible";
+            }
+            
+            function hideBasemapGallery(){
+                div = dojo.byId("basemapGalleryDiv");
+                div.style.visibility = "hidden";
             }
             
             function addDynamicLayer(layerID, url, definitionExpression, opacity){
@@ -79,7 +121,6 @@
             function extentHistoryChangeHandler(){
                 dijit.byId("zoomprev").disabled = navToolbar.isFirstExtent();
                 dijit.byId("zoomnext").disabled = navToolbar.isLastExtent();
-                
             }
             
             function resizeMap(){
@@ -170,25 +211,30 @@
             
             //CALLED WHEN THE PAGE LOADS AND GETS THE SPECIES INFO
             function getSpeciesInfo(spcID){
-                var queryTask = new esri.tasks.QueryTask("http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/1?token=" + token); //instantiate a querytask that will be used to get the species binomial
-                var query = new esri.tasks.Query(); //instantiate a query to filter the query task
-                query.returnGeometry = false;
-                query.outFields = ["friendly_name", "rl_category"];
-                query.where = "tax_id=" + spcID;
-                queryTask.execute(query, showResults); //call the query to get the binomial
+                var spName = taxon.replace(" ", "-");
+                dojo.io.script.get({
+                    url: "http://api.iucnredlist.org/common_names/" + spcID + ".js?callback=parseSpeciesData"
+                });
             }
             
-            //ASYNCHRONOUS CALLBACK FUNCTION WITH THE RESULTS FOR THE SPECIES BINOMIAL
-            function showResults(results){
+            //ASYNCHRONOUS CALLBACK FUNCTION WITH THE RESULTS FOR THE SPECIES INFO
+            function parseSpeciesData(results){
                 if (results.features.length > 0) {
                     var featureAttributes = results.features[0].attributes; //get the attributes of any features returned
                     var taxon = featureAttributes["friendly_name"];
-                    getSpeciesData(taxon);
+                    var species = data[0];
+                    dojo.byId("spClass").innerHTML = capitaliseFirstLetter(species['class']);
+                    dojo.byId("spOrder").innerHTML = capitaliseFirstLetter(species['order']);
+                    dojo.byId("spFamily").innerHTML = capitaliseFirstLetter(species['family']);
+                    dojo.byId("spGenus").innerHTML = capitaliseFirstLetter(species['genus']);
+                    dojo.byId("spAuthority").innerHTML = capitaliseFirstLetter(species['authority']);
+                    dojo.byId("spCategory").innerHTML = capitaliseFirstLetter(species['category']);
                     dojo.byId("species").innerHTML = "<i>" + taxon + "</i>"; //set the text in the UI
                     //                    dojo.attr(dojo.byId("species"), "class", "Status " + taxon);
                     //                    dojo.attr(dojo.byId("species"), "class", "Status");
                     dojo.doc.title = taxon; //set the document title
-                    dojo.byId("statusImage").src = "images/200px-Status_iucn3.1_" + featureAttributes["rl_category"] + ".svg.png";
+                    //                    dojo.byId("statusImage").src = "images/200px-Status_iucn3.1_" + featureAttributes["rl_category"] + ".svg.png";
+                    dojo.byId("statusImage").src = "images/RL_" + featureAttributes["rl_category"] + ".png";
                     var fadeOut = dojo.fadeOut({
                         node: "mainLoadingDiv",
                         duration: 10
@@ -205,25 +251,6 @@
                 }
             }
             
-            //CALLS THE RED LIST API TO GET THE SPECIES DATA
-            function getSpeciesData(taxon){
-                var spName = taxon.replace(" ", "-");
-                dojo.io.script.get({
-                    url: "http://api.iucnredlist.org/index/species/" + spName + ".js?callback=parseSpeciesData"
-                });
-            }
-            
-            //ASYNCHRONOUS RETURN FOR THE RED LIST API CALL
-            function parseSpeciesData(data){
-                var species = data[0];
-                dojo.byId("spClass").innerHTML = capitaliseFirstLetter(species['class']);
-                dojo.byId("spOrder").innerHTML = capitaliseFirstLetter(species['order']);
-                dojo.byId("spFamily").innerHTML = capitaliseFirstLetter(species['family']);
-                dojo.byId("spGenus").innerHTML = capitaliseFirstLetter(species['genus']);
-                dojo.byId("spAuthority").innerHTML = capitaliseFirstLetter(species['authority']);
-                dojo.byId("spCategory").innerHTML = capitaliseFirstLetter(species['category']);
-            }
-            
             function capitaliseFirstLetter(word){
                 return word.substr(0, 1).toUpperCase() + word.substr(1, word.length - 1).toLowerCase();
             }
@@ -231,7 +258,40 @@
     </head>
     <body class="tundra">
         <div id="mainLoadingDiv">
-            <img src="images/loading.gif" alt="Loading image"/>
+            <!--shows until the basemap is loaded--><img src="images/loading.gif" alt="Loading image"/>
+        </div>
+        <div id="mapDiv">
+            <!-- Map Section -->
+            <div id="navToolbar" dojoType="dijit.Toolbar">
+                <!--map toolbar-->
+                <div dojoType="dijit.form.Button" id="zoomin" iconClass="zoominIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_IN);">
+                </div>
+                <div dojoType="dijit.form.Button" id="zoomout" iconClass="zoomoutIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_OUT);">
+                </div>
+                <div dojoType="dijit.form.Button" id="zoomfullext" iconClass="zoomfullextIcon" onClick="navToolbar.zoomToFullExtent();">
+                </div>
+                <div dojoType="dijit.form.Button" id="zoomprev" iconClass="zoomprevIcon" onClick="navToolbar.zoomToPrevExtent();">
+                </div>
+                <div dojoType="dijit.form.Button" id="zoomnext" iconClass="zoomnextIcon" onClick="navToolbar.zoomToNextExtent();">
+                </div>
+                <div dojoType="dijit.form.Button" id="pan" iconClass="panIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.PAN);">
+                </div>
+                <div dojoType="dijit.form.Button" id="deactivate" iconClass="deactivateIcon" onClick="navToolbar.deactivate()">
+                </div>
+            </div>
+            <div id="map">
+                <!--map-->
+                <div id="loadingDiv" style="width:16px;left:50%;top:50%;position:absolute;z-index:100">
+                    <!--shows while the extent for the species is being retrieved--><img id="loadingImg" src="images/loading.gif" alt="Loading image"/>
+                </div>
+                <div dojoType="dijit.layout.ContentPane" id="basemapGalleryDiv" style="width:366px;height:490px">
+                    <div id="basemapGallery">
+                    </div>
+                    <button dojoType="dijit.form.Button" onclick="hideBasemapGallery()">
+                        OK
+                    </button>
+                </div>
+            </div>
         </div>
         <div id="mainWindow" dojotype="dijit.layout.BorderContainer" design="headline" gutters="false" style="width:100%; height:100%;opacity:0">
             <!-- Right Sidebar Section-->
@@ -269,6 +329,9 @@
                                 </div>
                             </div>
                             <div dojoType="dijit.layout.ContentPane" region="bottom">
+                                <button dojoType="dijit.form.Button" onclick="showBasemapGallery()" id="basemapGalleryButton">
+                                    Click to open basemap gallery
+                                </button>
                                 <div id="extentMap">
                                 </div>
                                 <div id="iucnImage">
@@ -276,37 +339,19 @@
                                 </div>
                             </div>
                         </div>
-                    </div><!--Sidebar Bottom-->
-                    <!--Panel bottom-->
+                    </div><!--Sidebar Bottom--><!--Panel bottom-->
                     <div id="footer" dojotype="dijit.layout.ContentPane" region="bottom">
+                        <div>
+                            T & Cs will be linked here
+                        </div>
+                        <div>
+                            Source will go here
+                        </div>
                         Published by IUCN<span id="owner"></span>
                     </div>
                 </div>
             </div>
-            <!-- Map Section -->
-            <div dojotype="dijit.layout.ContentPane" region="center">
-                <div id="navToolbar" dojoType="dijit.Toolbar">
-                    <div dojoType="dijit.form.Button" id="zoomin" iconClass="zoominIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_IN);">
-                    </div>
-                    <div dojoType="dijit.form.Button" id="zoomout" iconClass="zoomoutIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.ZOOM_OUT);">
-                    </div>
-                    <div dojoType="dijit.form.Button" id="zoomfullext" iconClass="zoomfullextIcon" onClick="navToolbar.zoomToFullExtent();">
-                    </div>
-                    <div dojoType="dijit.form.Button" id="zoomprev" iconClass="zoomprevIcon" onClick="navToolbar.zoomToPrevExtent();">
-                    </div>
-                    <div dojoType="dijit.form.Button" id="zoomnext" iconClass="zoomnextIcon" onClick="navToolbar.zoomToNextExtent();">
-                    </div>
-                    <div dojoType="dijit.form.Button" id="pan" iconClass="panIcon" onClick="navToolbar.activate(esri.toolbars.Navigation.PAN);">
-                    </div>
-                    <div dojoType="dijit.form.Button" id="deactivate" iconClass="deactivateIcon" onClick="navToolbar.deactivate()">
-                    </div>
-                </div>
-                <div id="map" dojotype="dijit.layout.ContentPane">
-                    <div id="loadingDiv" style="width:16px;left:50%;top:50%;position:absolute;z-index:100">
-                        <img id="loadingImg" src="images/loading.gif" alt="Loading image"/>
-                    </div>
-                </div>
-            </div><!-- Footer Section-->
+            <!-- Footer Section-->
         </div>
     </body>
 </html>

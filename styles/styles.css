@@ -3,58 +3,9 @@ html, body {
     width: 99%;
     margin: 0.5% 0.5% 0.5% 0.5%;
     padding: 0;
-}
-
-body {
-    background-color: #FFF;
-    color: #333;
+    font-family: "Helvetica Neue", Helvetica, "Trebuchet MS", Arial, sans-serif;
     font-size: 12px;
     overflow: hidden;
-    font-family: "Helvetica Neue", Helvetica, "Trebuchet MS", Arial, sans-serif;
-}
-
-a {
-    color: #369;
-}
-
-#header {
-    border: solid 1px #999;
-    height: 80px;
-    background-color:#d6250d;
-    -webkit-border-top-left-radius: 4px;
-    -webkit-border-top-right-radius: 4px;
-    -moz-border-radius-topleft: 4px;
-    -moz-border-radius-topright: 4px;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    border-top- margin: 0;
-}
-
-#taxonHierarchy {
-    padding: 10px 10px 10px 15px;
-    color: #FFF;
-}
-
-#species {
-    color: #FFF;
-    font-size: 25px;
-    text-align: left;
-    font-weight: bolder;
-    text-shadow: 0 1px 0 #333;
-    padding-left: 15px;
-    padding-bottom: 7px;
-    line-height: 17px;
-}
-
-#spAuthority {
-    color: #FFF;
-    padding-left: 10px;
-}
-
-#subtitle {
-    font-size: 10px;
-    color: #444;
-    padding-left: 15px;
 }
 
 #mainLoadingDiv {
@@ -62,7 +13,14 @@ a {
     left: 50%;
     top: 50%;
     position: absolute;
-    z-index: 1000;
+    z-index: 1;
+}
+
+#closePanel {
+    right: 25px;
+    top: 23px;
+    position: absolute;
+    z-index: 3;
 }
 
 #mapDiv {
@@ -72,11 +30,14 @@ a {
     top: 0;
     position: absolute;
     z-index: 1;
+    visibility: hidden;
 }
 
 #map {
     width: 100%;
     height: 100%;
+    border: 1px solid #000;
+    padding: 0;
 }
 
 #navToolbar {
@@ -87,70 +48,77 @@ a {
     opacity: 0.9;
 }
 
-.pane {
-    background-color: #ffffff;
-    margin: 0;
-    padding: 0;
-    opacity: 0.96;
-    border-left:solid 1px #999;
-    border-right:solid 1px #999;
+#loadingDiv {
+    width: 16px;
+    left: 50%;
+    top: 50%;
+    position: absolute;
+    z-index: 100
 }
 
-.paneContent {
-    height: 100%;
+#basemapGalleryDiv {
+    position: absolute;
+    z-Index: 2;
+    background-color: white;
+    overflow: auto;
+    visibility: hidden;
+    padding: 15px;
+}
+
+#panel {
     width: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-.paneHeader {
-    background: url(../images/chrome_leftheaderbg.png) repeat-x;
-    border-bottom: solid 1px #999;
-    color: #FFF;
-    height: 38px;
-    font-size: 18px;
-    line-height: 38px;
-    margin: 0;
-    padding: 10px 10px 10px 15px;
-}
-
-.paneBody {
-    margin: 0;
-}
-
-.paneBody .panel_content {
-    padding: 10px;
     height: 100%;
-    width: 100%;
-}
-
-.paneTitle {
-    padding-left: 14px;
-    padding-right: 14px;
-}
-
-.paneTitle:hover {
-    color: #CC6633;
-    cursor: pointer;
+    visibility: hidden;
 }
 
 #rightPane {
-    width: 330px;
+    width: 350px;
+    border: 1px solid #666;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-color: #fcfcfc;
+    position: relative;
 }
 
-#footer {
-    font-size: 12px;
+#top {
+    background-color: #d6250d;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    position: relative;
+    overflow: hidden;
+    padding: 12px;
+}
+
+#center {
+    top: 0px;
+}
+
+#taxonHierarchy {
+    padding: 5px;
+    color: #FFF;
+}
+
+#species {
+    color: #FFF;
+    font-size: 25px;
+    font-weight: bolder;
+    text-shadow: 0 1px 0 #333;
+    padding: 0px 5px 10px 5px;
+}
+
+#spAuthority {
+    color: #FFF;
+    padding: 0px 5px 15px 5px;
+}
+
+#bottom {
     color: #fff;
-    border: solid 1px #999;
-    background-color:#d6250d;
-    -webkit-border-bottom-left-radius: 4px;
-    -webkit-border-bottom-right-radius: 4px;
-    -moz-border-radius-bottomleft: 4px;
-    -moz-border-radius-bottomright: 4px;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
+    background-color: #d6250d;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
     text-align: right;
-    height: 18px;
     margin: 0;
     padding: 10px 15px 5px;
 }
@@ -292,13 +260,4 @@ a {
     0px;
     padding:
     0px;
-}
-
-#basemapGalleryDiv {
-    position: absolute;
-    z-Index: 999;
-    background-color: white;
-    overflow: auto;
-    visibility: hidden;
-    padding: 15px;
 }
