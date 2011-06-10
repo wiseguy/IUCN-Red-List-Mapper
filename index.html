@@ -22,6 +22,7 @@
             dojo.require("dijit.layout.ContentPane");
             dojo.require("esri.toolbars.navigation");
             dojo.require("dijit.form.Button");
+            dojo.require("dijit.form.CheckBox");
             dojo.require("dijit.Toolbar");
             dojo.require("dijit.dijit");
             dojo.require("dijit.form.Button");
@@ -30,7 +31,7 @@
             dojo.require("dojo.window");
             dojo.require("esri.map");
             dojo.require("dijit.Tooltip");
-            var map, extentMap, renderer, navToolbar, resizeTimer;
+            var map, extentMap, renderer, navToolbar, resizeTimer, basemapGalleryOpen;
             var layerDefinitions = []; //used to filter the results for an individual species
             dojo.addOnLoad(onLoad);
             
@@ -43,16 +44,7 @@
                 map = new esri.Map("map", {
                     wrapAround180: true
                 });
-                extentMap = new esri.Map("extentMap", {
-                    slider: false,
-                    nav: false
-                });
-                //BASEMAP FOR THE OVERVIEW MAP
-                var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer");
-                extentMap.addLayer(basemap);
-                
-                //EVENT LISTENERS FOR THE MAPS
-                dojo.connect(extentMap, "onLoad", loadExtentMap); //disable the map navigation controls for the extent map
+                createExtentMap();
                 dojo.connect(map, "onLoad", createScaleBar);
                 dojo.connect(map, "onZoomStart", showLoading);
                 dojo.connect(map, "onPanStart", showLoading);
@@ -85,6 +77,20 @@
                 
             }
             
+            function createExtentMap(){
+                extentMap = new esri.Map("extentMap", {
+                    slider: false,
+                    nav: false,
+                    wrapAround180: true
+                });
+                //BASEMAP FOR THE OVERVIEW MAP
+                var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer");
+                extentMap.addLayer(basemap);
+                
+                //EVENT LISTENERS FOR THE MAPS
+                dojo.connect(extentMap, "onLoad", loadExtentMap); //disable the map navigation controls for the extent map
+            }
+            
             function createScaleBar(){
                 var scalebar = new esri.dijit.Scalebar({
                     map: map
@@ -99,6 +105,16 @@
                 });
             }
             
+            function toggleBasemap(){
+                var button = dojo.byId("basemapGalleryButton");
+                if (button.checked) {
+                    showBasemapGallery();
+                }
+                else {
+                    hideBasemapGallery();
+                }
+            }
+            
             function showBasemapGallery(){
                 var button = dojo.byId("basemapGalleryButton");
                 var coords = dojo.coords(button);
@@ -106,7 +122,7 @@
                 var windowBox = dojo.window.getBox();
                 var divHeightStr = div.style.height;
                 var divHeight = divHeightStr.substr(0, divHeightStr.length - 2);
-                div.style.right = (windowBox.w - coords.x) + "px";
+                div.style.right = (windowBox.w - coords.x + 15) + "px";
                 div.style.top = Math.round((windowBox.h - divHeight) / 2) + "px";
                 div.style.visibility = "visible";
             }
@@ -119,6 +135,26 @@
             function extentHistoryChangeHandler(){
                 dijit.byId("zoomprev").disabled = navToolbar.isFirstExtent();
                 dijit.byId("zoomnext").disabled = navToolbar.isLastExtent();
+            }
+            
+            function toggleExtentMap(){
+                if ((dojo.byId("extentMapHolder").style.visibility == "visible") || (dojo.byId("extentMapHolder").style.visibility == "")) {
+                    hideExtentMap();
+                }
+                else {
+                    showExtentMap();
+                }
+            }
+            
+            function hideExtentMap(){
+                extentMap.destroy();
+                dojo.byId("extentMapHolder").style.visibility = "hidden";
+                dojo.byId("extentButton").checked = "no";
+            }
+            
+            function showExtentMap(){
+                createExtentMap(); //this is a hack as setting the maps style.visibility to hidden does not remove it!
+                dojo.byId("extentMapHolder").style.visibility = "visible";
             }
             
             //GETS THE SPECIES ID FROM THE QUERYSTRING
@@ -199,7 +235,12 @@
                     },
                     load: function(response){
                         var sources = response.sources;
-                        dojo.byId("sources").innerHTML = sources[0].Source;
+                        if (sources[0].Source == " ") {
+                            dojo.byId("sources").innerHTML = "Citation: No citation available";
+                        }
+                        else {
+                            dojo.byId("sources").innerHTML = "Citation:" + sources[0].Source;
+                        }
                     },
                     error: esriConfig.defaults.io.errorHandler
                 });
@@ -210,6 +251,7 @@
                 extentMap.disableKeyboardNavigation();
                 extentMap.disableMapNavigation();
                 extentMap.disablePan();
+                extentChanged(map.extent);
             }
             
             //CALLED WHEN THE MAP EXTENT CHANGES AND DRAWS THE POLYGON ON THE OVERVIEW MAP
@@ -254,12 +296,12 @@
                     dojo.byId("statusImage").src = "images/RL_" + species['category'] + ".png";
                     setImageTitle(species['category']);
                     var synonymy = results.common_names;
-                    dojo.doc.title = synonymy[0]['name']; //set the document title
-                    var names = "";
-                    for (var i = synonymy.length - 1; i >= 0; i--) {
-                        names = names + synonymy[i]['name']
-                    };
-                    dojo.byId('synonyms').innerHTML = names;
+                    if (synonymy.length > 0) {
+                        dojo.doc.title = species['scientific_name'] + " (" + synonymy[0]['name'] + ")";
+                    }
+                    else {
+                        dojo.doc.title = species['scientific_name'];
+                    }
                 }
                 else {
                     dojo.byId("title").innerHTML = "No species found";
@@ -271,45 +313,50 @@
             }
             
             function setImageTitle(category){
+                var img = dojo.byId("statusImage")
                 switch (category) {
                     case "NE":
-                        statusImage.title = "Not Evaluated";
+                        img.title = "Not Evaluated";
                         break;
                     case "DD":
-                        statusImage.title = "Data Deficient";
+                        img.title = "Data Deficient";
                         break;
                     case "LC":
-                        statusImage.title = "Least Concern";
+                        img.title = "Least Concern";
                         break;
                     case "NT":
-                        statusImage.title = "Near Threatened";
+                        img.title = "Near Threatened";
                         break;
                     case "VU":
-                        statusImage.title = "Vulnerable";
+                        img.title = "Vulnerable";
                         break;
                     case "EN":
-                        statusImage.title = "Endangered";
+                        img.title = "Endangered";
                         break;
                     case "CR":
-                        statusImage.title = "Critically Endangered";
+                        img.title = "Critically Endangered";
                         break;
                     case "EW":
-                        statusImage.title = "Extinct in the Wild";
+                        img.title = "Extinct in the Wild";
                         break;
                     case "EX":
-                        statusImage.title = "Extinct";
+                        img.title = "Extinct";
                         break;
                     default:
-                        statusImage.title = "No information";
+                        img.title = "No information";
                 }
             }
             
             function togglePanel(){
                 if (dojo.byId("panel").style.visibility == "hidden") {
                     dojo.byId("panel").style.visibility = "visible";
+                    dojo.byId("closeImg").style.visibility = "visible";
+                    dojo.byId("openImg").style.visibility = "hidden";
                 }
                 else {
                     dojo.byId("panel").style.visibility = "hidden";
+                    dojo.byId("closeImg").style.visibility = "hidden";
+                    dojo.byId("openImg").style.visibility = "visible";
                 }
             }
         </script>
@@ -319,10 +366,14 @@
             <img src="images/loading.gif" alt="Loading image"/>
         </div>
         <div id="closePanel">
-            <img src="images/close.png" alt="Close button" onclick="togglePanel()"/>
+            <img id="closeImg" src="images/close.png" alt="Close button" onclick="togglePanel()" class="img"/><img id="openImg" src="images/open.png" alt="Open button" onclick="togglePanel()" class="img" style="visibility:hidden"/>
         </div>
         <div id="mapDiv" dojotype="dijit.layout.BorderContainer" design="headline" gutters="false">
             <div id="map" dojotype="dijit.layout.ContentPane" region="center">
+                <div id="extentMapHolder">
+                    <div id="extentMap">
+                    </div>
+                </div>
                 <div id="loadingDiv">
                     <img id="loadingImg" src="images/loading.gif" alt="Loading image"/>
                 </div>
@@ -364,66 +415,68 @@
             <div dojoType="dijit.Tooltip" connectId="deactivate" position="below">
                 Deactivate the current tool
             </div>
-            <div id="basemapGalleryDiv" dojoType="dijit.layout.ContentPane" id="basemapGalleryDiv" style="width:366px;height:490px;">
+            <div id="basemapGalleryDiv" dojoType="dijit.layout.ContentPane" id="basemapGalleryDiv" style="width:366px;height:440px;">
                 <div id="basemapGallery">
                 </div>
-                <button dojoType="dijit.form.Button" onclick="hideBasemapGallery()">
-                    OK
-                </button>
             </div>
         </div>
         <div id="panel" dojotype="dijit.layout.BorderContainer" design="headline" gutters="false">
-            <!-- Right Sidebar Section-->
             <div id="rightPane" dojotype="dijit.layout.ContentPane" region="right">
-                <div dojotype="dijit.layout.BorderContainer" design="sidebar" gutters="false">
-                    <!--Panel Top-->
-                    <div id="top" dojotype="dijit.layout.ContentPane" region="top">
-                        <div id="taxonHierarchy">
-                            <span id="spClass"></span>
-                            > <span id="spOrder"></span>
-                            > <span id="spFamily"></span>
-                            > <span id="spGenus"></span>
+                <div id="header">
+                    <div>
+                        <ul id="taxonHierarchy">
+                            <li id="spClass" class="leftLI">
+                            </li>
+                            <li id="spOrder" class="LI">
+                            </li>
+                            <li id="spFamily" class="LI">
+                            </li>
+                            <li id="spGenus" class="rightLI">
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="species">
+                    </div>
+                    <div id="spAuthority">
+                    </div>
+                </div>
+                <div id="middle">
+                    <img id="statusImage" src=""/>
+                    <div>
+                        <span id="legend">Legend:</span>
+                        <ul id="legendItems">
+                            <li data-template class="legendItem">
+                                <img src="images/{{ImageURL}}" style="vertical-align:middle;"/><span style="vertical-align:middle;padding-left:5px;font-family:'Lucida grande'">{{LegendClass}}</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="basemapPanel">
+                        <span><input dojoType="dijit.form.CheckBox" onclick="toggleBasemap()" id="basemapGalleryButton">
+                            </input>
+                            <label for="basemapGalleryButton">
+                                Basemap
+                            </label>
+                        </span>
+                        <span><input dojoType="dijit.form.CheckBox" onclick="toggleExtentMap()" id="extentButton" checked="true">
+                            </input>
+                            <label for="extentButton">
+                                Overview map
+                            </label>
+                        </span>
+                        <div id="sources">
                         </div>
-                        <div id="species">
+                        <div onclick="window.open('http://www.iucnredlist.org/info/terms-of-use')" class="terms" title="Click for Terms of Use">
+                            Terms of Use
                         </div>
-                        <div id="spAuthority">
+                        <div class="terms">
+                            Published by IUCN
                         </div>
-                        <!--     <div id="synonyms">
-                        </div>-->
-                        <div>
-                            <img id="statusImage" src=""/>
-                        </div>
-                        <div id="legend">
-                            Legend:
-                            <ol id="legendItems">
-                                <li data-template>
-                                    <img src="images/{{ImageURL}}"/>{{LegendClass}}
-                                </li>
-                            </ol>
-                        </div>
-                        <div>
-                            <button dojoType="dijit.form.Button" onclick="showBasemapGallery()" id="basemapGalleryButton">
-                                Click to open basemap gallery
-                            </button>
-                            <div id="extentMap">
-                            </div>
-                            <div id="iucnImage">
-                                <img src="images/iucn.png" alt="IUCN Image" title="IUCN Redlist Website" onclick="window.open('http://www.iucnredlist.org/')">
-                            </div>
-                        </div>
-                    </div><!--Sidebar Bottom--><!--Panel bottom-->
-                    <div id="bottom" dojotype="dijit.layout.ContentPane" region="bottom">
-                        <div>
-                            <span onclick="window.open('http://www.iucnredlist.org/info/terms-of-use')" id="terms" title="Click for Terms of Use">Terms of Use</span>
-                        </div>
-                        <div>
-                            <span id="sources"></span>
-                        </div>
-                        Published by IUCN<span id="owner"></span>
+                    </div>
+                    <div id="iucnImage">
+                        <img src="images/iucn.png" alt="IUCN Image" title="IUCN Redlist Website" onclick="window.open('http://www.iucnredlist.org/')">
                     </div>
                 </div>
             </div>
-            <!-- Footer Section-->
         </div>
     </body>
 </html>
