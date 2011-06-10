@@ -37,6 +37,8 @@
             function onLoad(){
                 ID_NO = getSpeciesID(); //get the species ID from the query string
                 getExtent(ID_NO); //get the extent of the current species
+                getLegendClasses(ID_NO); //get the legend classes of the current species, e.g. native, extinct etc.
+                getSource(ID_NO); //get the source
                 getSpeciesInfo(ID_NO); //get the species info
                 map = new esri.Map("map", {
                     wrapAround180: true
@@ -167,6 +169,42 @@
                 });
             }
             
+            //GETS THE LEGEND CLASSES OF THE PASSED SPECIES USING A SOE
+            function getLegendClasses(spcID){
+                esri.request({
+                    url: "http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/exts/IUCNRedListSOE/GetLegendClasses",
+                    callbackParamName: "callback",
+                    content: {
+                        f: "json",
+                        ID_NO: spcID,
+                        token: token
+                    },
+                    load: function(response){
+                        var legendClasses = response.legendClasses;
+                        Tempo.prepare('legendItems').render(legendClasses);
+                    },
+                    error: esriConfig.defaults.io.errorHandler
+                });
+            }
+            
+            //GETS THE Source THE PASSED SPECIES USING A SOE
+            function getSource(spcID){
+                esri.request({
+                    url: "http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/exts/IUCNRedListSOE/GetSources",
+                    callbackParamName: "callback",
+                    content: {
+                        f: "json",
+                        ID_NO: spcID,
+                        token: token
+                    },
+                    load: function(response){
+                        var sources = response.sources;
+                        dojo.byId("sources").innerHTML = sources[0].Source;
+                    },
+                    error: esriConfig.defaults.io.errorHandler
+                });
+            }
+            
             //DISABLE THE INTERACTIVITY IN THE OVERVIEW MAP
             function loadExtentMap(){
                 extentMap.disableKeyboardNavigation();
@@ -269,7 +307,7 @@
             function togglePanel(){
                 if (dojo.byId("panel").style.visibility == "hidden") {
                     dojo.byId("panel").style.visibility = "visible";
-                } 
+                }
                 else {
                     dojo.byId("panel").style.visibility = "hidden";
                 }
@@ -355,18 +393,15 @@
                         <div>
                             <img id="statusImage" src=""/>
                         </div>
-                        <div>
-                            <img id="speciesImage" src="http://i789.photobucket.com/albums/yy179/brezzy868792/orangutan.jpg" title="Image of Orang Utan"/>
-                        </div>
                         <div id="legend">
                             Legend:
-                            <div class="legendItem">
-                                <div class="legendItemSymbol">
-                                </div>
-                                <div class="legendItemText">
-                                    Native (resident)
-                                </div>
-                            </div>
+                            <ol id="legendItems">
+                                <li data-template>
+                                    <img src="images/{{ImageURL}}"/>{{LegendClass}}
+                                </li>
+                            </ol>
+                        </div>
+                        <div>
                             <button dojoType="dijit.form.Button" onclick="showBasemapGallery()" id="basemapGalleryButton">
                                 Click to open basemap gallery
                             </button>
@@ -379,10 +414,10 @@
                     </div><!--Sidebar Bottom--><!--Panel bottom-->
                     <div id="bottom" dojotype="dijit.layout.ContentPane" region="bottom">
                         <div>
-                            T & Cs will be linked here
+                            <span onclick="window.open('http://www.iucnredlist.org/info/terms-of-use')" id="terms" title="Click for Terms of Use">Terms of Use</span>
                         </div>
                         <div>
-                            Source will go here
+                            <span id="sources"></span>
                         </div>
                         Published by IUCN<span id="owner"></span>
                     </div>
