@@ -44,7 +44,6 @@
                 map = new esri.Map("map", {
                     wrapAround180: true
                 });
-                createExtentMap();
                 dojo.connect(map, "onLoad", createScaleBar);
                 dojo.connect(map, "onZoomStart", showLoading);
                 dojo.connect(map, "onPanStart", showLoading);
@@ -149,7 +148,6 @@
             function hideExtentMap(){
                 extentMap.destroy();
                 dojo.byId("extentMapHolder").style.visibility = "hidden";
-                dojo.byId("extentButton").checked = "no";
             }
             
             function showExtentMap(){
@@ -166,15 +164,13 @@
             
             //SHOWS THE LOADING IMAGE WHEN THE RDB LAYER IS LOADING
             function showLoading(){
-                div = dojo.byId("loadingDiv");
-                div.style.visibility = "visible";
+                dojo.byId("loadingDiv").style.visibility = "visible";
                 map.disableMapNavigation();
             }
             
             //HIDES THE LOADING IMAGE WHEN THE RDB LAYER IS LOADING
             function hideLoading(){
-                div = dojo.byId("loadingDiv");
-                div.style.visibility = "hidden";
+                dojo.byId("loadingDiv").style.visibility = "hidden";
                 map.enableMapNavigation();
             }
             
@@ -194,11 +190,12 @@
                             wkid: 102100
                         });
                         map.setExtent(extent, true);
+                        showExtentMap();
+                        dojo.byId("mainLoadingDiv").style.visibility = "hidden"; //hide the main loading div
+                        dojo.byId("mapDiv").style.visibility = "visible"; //show the map
+                        dojo.byId("panel").style.visibility = "visible"; //show the panel
                         dojo.connect(rdbLayer, "onUpdate", function(e){
-                            dojo.byId("mainLoadingDiv").style.visibility = "hidden";
-                            dojo.byId("mapDiv").style.visibility = "visible";
-                            dojo.byId("panel").style.visibility = "visible";
-                            hideLoading();
+                            hideLoading(); //hide the loading div at the end of the rdblayer update
                         });
                     },
                     error: esriConfig.defaults.io.errorHandler
@@ -216,7 +213,7 @@
                         token: token
                     },
                     load: function(response){
-                        var legendClasses = response.legendClasses;
+                        var legendClasses = response.legendclasses;
                         Tempo.prepare('legendItems').render(legendClasses);
                     },
                     error: esriConfig.defaults.io.errorHandler
@@ -368,12 +365,74 @@
         <div id="closePanel">
             <img id="closeImg" src="images/close.png" alt="Close button" onclick="togglePanel()" class="img"/><img id="openImg" src="images/open.png" alt="Open button" onclick="togglePanel()" class="img" style="visibility:hidden"/>
         </div>
-        <div id="mapDiv" dojotype="dijit.layout.BorderContainer" design="headline" gutters="false">
-            <div id="map" dojotype="dijit.layout.ContentPane" region="center">
-                <div id="extentMapHolder">
-                    <div id="extentMap">
+        <div id="extentMapHolder">
+            <div id="extentMap">
+            </div>
+        </div>
+        <div id="panel">
+            <div id="header">
+                <div>
+                    <ul id="taxonHierarchy">
+                        <li id="spClass" class="leftLI">
+                        </li>
+                        <li id="spOrder" class="LI">
+                        </li>
+                        <li id="spFamily" class="LI">
+                        </li>
+                        <li id="spGenus" class="rightLI">
+                        </li>
+                    </ul>
+                </div>
+                <div id="species">
+                </div>
+                <div id="spAuthority">
+                </div>
+            </div>
+            <div id="middle">
+                <img id="statusImage" src=""/>
+                <div>
+                    <span id="legend">Legend:</span>
+                    <ul id="legendItems">
+                        <li data-template class="legendItem">
+                            <img src="images/{{imageurl}}" style="vertical-align:middle;"/><span style="vertical-align:middle;padding-left:5px;font-family:'Lucida grande'">{{legendclass}}</span>
+                        </li>
+                        <li data-template data-if-legendclass="">
+                        </li>
+                    </ul>
+                </div>
+                <div id="checkboxes">
+                    <span><input dojoType="dijit.form.CheckBox" onclick="toggleBasemap()" id="basemapGalleryButton">
+                        </input>
+                        <label for="basemapGalleryButton">
+                            Basemap
+                        </label>
+                    </span>
+                    <span><input dojoType="dijit.form.CheckBox" onclick="toggleExtentMap()" id="extentButton" checked="true">
+                        </input>
+                        <label for="extentButton">
+                            Overview map
+                        </label>
+                    </span>
+                    <div id="sources">
                     </div>
                 </div>
+                <div id="footer">
+                    <div id="termsText">
+                        <div onclick="window.open('http://www.iucnredlist.org/info/terms-of-use')" class="terms" title="Click for Terms of Use">
+                            Terms of Use
+                        </div>
+                        <div class="terms">
+                            Published by IUCN
+                        </div>
+                    </div>
+                    <div id="iucnImage">
+                        <img src="images/iucn.png" alt="IUCN Image" title="IUCN Redlist Website" onclick="window.open('http://www.iucnredlist.org/')">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="mapDiv" dojotype="dijit.layout.BorderContainer" design="headline" gutters="false">
+            <div id="map" dojotype="dijit.layout.ContentPane" region="center">
                 <div id="loadingDiv">
                     <img id="loadingImg" src="images/loading.gif" alt="Loading image"/>
                 </div>
@@ -417,64 +476,6 @@
             </div>
             <div id="basemapGalleryDiv" dojoType="dijit.layout.ContentPane" id="basemapGalleryDiv" style="width:366px;height:440px;">
                 <div id="basemapGallery">
-                </div>
-            </div>
-        </div>
-        <div id="panel" dojotype="dijit.layout.BorderContainer" design="headline" gutters="false">
-            <div id="rightPane" dojotype="dijit.layout.ContentPane" region="right">
-                <div id="header">
-                    <div>
-                        <ul id="taxonHierarchy">
-                            <li id="spClass" class="leftLI">
-                            </li>
-                            <li id="spOrder" class="LI">
-                            </li>
-                            <li id="spFamily" class="LI">
-                            </li>
-                            <li id="spGenus" class="rightLI">
-                            </li>
-                        </ul>
-                    </div>
-                    <div id="species">
-                    </div>
-                    <div id="spAuthority">
-                    </div>
-                </div>
-                <div id="middle">
-                    <img id="statusImage" src=""/>
-                    <div>
-                        <span id="legend">Legend:</span>
-                        <ul id="legendItems">
-                            <li data-template class="legendItem">
-                                <img src="images/{{ImageURL}}" style="vertical-align:middle;"/><span style="vertical-align:middle;padding-left:5px;font-family:'Lucida grande'">{{LegendClass}}</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div id="basemapPanel">
-                        <span><input dojoType="dijit.form.CheckBox" onclick="toggleBasemap()" id="basemapGalleryButton">
-                            </input>
-                            <label for="basemapGalleryButton">
-                                Basemap
-                            </label>
-                        </span>
-                        <span><input dojoType="dijit.form.CheckBox" onclick="toggleExtentMap()" id="extentButton" checked="true">
-                            </input>
-                            <label for="extentButton">
-                                Overview map
-                            </label>
-                        </span>
-                        <div id="sources">
-                        </div>
-                        <div onclick="window.open('http://www.iucnredlist.org/info/terms-of-use')" class="terms" title="Click for Terms of Use">
-                            Terms of Use
-                        </div>
-                        <div class="terms">
-                            Published by IUCN
-                        </div>
-                    </div>
-                    <div id="iucnImage">
-                        <img src="images/iucn.png" alt="IUCN Image" title="IUCN Redlist Website" onclick="window.open('http://www.iucnredlist.org/')">
-                    </div>
                 </div>
             </div>
         </div>
