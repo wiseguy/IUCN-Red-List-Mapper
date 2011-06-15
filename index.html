@@ -105,8 +105,8 @@
             }
             
             function toggleBasemap(){
-                var button = dojo.byId("basemapGalleryButton");
-                if (button.checked) {
+                if (dojo.byId("basemapGalleryDiv").style.visibility == "hidden") 
+                {
                     showBasemapGallery();
                 }
                 else {
@@ -124,11 +124,13 @@
                 div.style.right = (windowBox.w - coords.x + 15) + "px";
                 div.style.top = Math.round((windowBox.h - divHeight) / 2) + "px";
                 div.style.visibility = "visible";
+                dijit.byId("basemapGalleryButton").attributes.value="off";
             }
             
             function hideBasemapGallery(){
                 div = dojo.byId("basemapGalleryDiv");
                 div.style.visibility = "hidden";
+                dijit.byId("basemapGalleryButton").setValue(false);
             }
             
             function extentHistoryChangeHandler(){
@@ -148,6 +150,7 @@
             function hideExtentMap(){
                 extentMap.destroy();
                 dojo.byId("extentMapHolder").style.visibility = "hidden";
+                dijit.byId("extentButton").setValue(false);
             }
             
             function showExtentMap(){
@@ -165,14 +168,11 @@
             //SHOWS THE LOADING IMAGE WHEN THE RDB LAYER IS LOADING
             function showLoading(){
                 dojo.byId("loadingDiv").style.visibility = "visible";
-                map.disableMapNavigation();
             }
             
             //HIDES THE LOADING IMAGE WHEN THE RDB LAYER IS LOADING
             function hideLoading(){
                 dojo.byId("loadingDiv").style.visibility = "hidden";
-                map.enableMapNavigation();
-                map.disablePan();
             }
             
             //GETS THE EXTENT OF THE PASSED SPECIES USING A SOE
@@ -201,6 +201,14 @@
                     },
                     error: esriConfig.defaults.io.errorHandler
                 });
+            }
+            //gets the bounds of the visible area (i.e. to the left of the panel)
+            function calculateVisibleBounds(){
+                var panel = dojo.byId("panel");
+                var coords = dojo.coords(panel);
+                var point = map.toMap(new esri.geometry.Point(coords.x,coords.y));
+                var targetExtent = new esri.geometry.Extent(map.extent.xmin, map.extent.ymin, point.x, map.extent.ymax, new esri.SpatialReference({wkid: 102100}));
+                return targetExtent;
             }
             
             //GETS THE LEGEND CLASSES OF THE PASSED SPECIES USING A SOE
@@ -290,21 +298,19 @@
                     dojo.byId("spFamily").innerHTML = capitaliseFirstLetter(species['family']);
                     dojo.byId("spAuthority").innerHTML = species['authority'];
                     dojo.byId("statusImage").src = "images/RL_" + species['category'] + ".png";
+                    dojo.byId("species").innerHTML = "<i>" + species['scientific_name'] + "</i>";
+                    dojo.doc.title = species['scientific_name'];
                     setImageTitle(species['category']);
                     var synonymy = results.common_names;
                     if (synonymy.length > 0) {
                         dojo.doc.title = species['scientific_name'] + " (" + synonymy[0]['name'] + ")";
-                        dojo.byId("species").innerHTML = "<i>" + species['scientific_name'] + "</i> (" + synonymy[0]['name'] + ")";
-                    }
-                    else {
-                        dojo.byId("species").innerHTML = "<i>" + species['scientific_name'] + "</i>";
-                        dojo.doc.title = species['scientific_name'];
+                        dojo.byId("commonName").innerHTML = "(" + synonymy[0]['name'] + ")";
                     }
                     if (species['modified_year'] > 0) {
-                        dojo.byId("yearOfAssessment").innerHTML = "Assessed: " + species['modified_year'];
+                        dojo.byId("yearOfAssessment").innerHTML = "Assessment date: " + species['modified_year'];
                     }
                     else {
-                        dojo.byId("yearOfAssessment").innerHTML = "Assessed: Not known";
+                        dojo.byId("yearOfAssessment").innerHTML = "Assessment date: Not known";
                     }
                 }
                 else {
@@ -390,6 +396,8 @@
                 </div>
                 <div id="species">
                 </div>
+                <div id="commonName">
+                </div>
                 <div id="spAuthority">
                 </div>
             </div>
@@ -428,21 +436,18 @@
                         <div onclick="window.open('http://www.iucnredlist.org/info/terms-of-use')" class="terms" title="Click for Terms of Use">
                             Terms of Use
                         </div>
-                        <div class="terms">
-                            Published by IUCN
-                        </div>
                     </div>
                 </div>
                 <div id="logos">
-                    <div class="iucnImage">
-                        <img src="images/iucn.png" alt="IUCN Image" title="IUCN Redlist Website" onclick="window.open('http://www.iucnredlist.org/')">
+                    <div class="iucnImage" style="padding-top:15px;">
+                        <img src="images/iucn_logo.gif" alt="IUCN Image" title="IUCN" onclick="window.open('http://www.iucn.org/')">
                     </div>
                     <div class="iucnImage" style="padding-top:20px;">
                         <img src="images/ssc_logo.gif" alt="SSC Image" title="Species Survival Commission" onclick="window.open('http://www.iucn.org/about/work/programmes/species/about_ssc/')">
                     </div>
-                    <div class="iucnImage" style="padding-top:15px;">
-                        <img src="images/iucn_logo.gif" alt="IUCN Image" title="IUCN" onclick="window.open('http://www.iucn.org/')">
-                    </div>
+                </div>
+                <div class="iucnImage" style="float:right;">
+                    <img src="images/iucn.png" alt="IUCN Image" title="IUCN Redlist Website" onclick="window.open('http://www.iucnredlist.org/')">
                 </div>
             </div>
         </div>
@@ -490,6 +495,7 @@
                 Deactivate the current tool
             </div>
             <div id="basemapGalleryDiv" dojoType="dijit.layout.ContentPane" id="basemapGalleryDiv" style="width:366px;height:440px;">
+                <img src="images/cross.png" class="close" title="Close" onclick="hideBasemapGallery()"/>
                 <div id="basemapGallery">
                 </div>
             </div>

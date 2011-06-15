@@ -5,7 +5,7 @@ html, body {
     padding: 0;
     font-family: "Lucida Grande", "Helvetica Neue", Helvetica, "Trebuchet MS", Arial, sans-serif;
     font-size: 12px;
-    color:#555;
+    color: #555;
     overflow: hidden;
 }
 
@@ -28,6 +28,14 @@ html, body {
     right: 0px;
     top: 0px;
     position: absolute;
+}
+
+.close {
+    right: 7px;
+    top: 7px;
+    float: right;
+    position:absolute;
+    z-index:10;
 }
 
 #mapDiv {
@@ -145,7 +153,16 @@ html, body {
     font-weight: bolder;
     text-shadow: 0 1px 0 #333;
     padding: 2px 10px 2px 10px;
-    clear:left;
+    clear: left;
+}
+
+#commonName {
+    color: #FFF;
+    font-size: 18px;
+    font-weight: bolder;
+    text-shadow: 0 1px 0 #333;
+    padding: 2px 10px 2px 10px;
+    clear: left;
 }
 
 #spAuthority {
@@ -259,17 +276,18 @@ html, body {
 }
 
 #statusImage {
-    border: 1px solid #ccc;
     margin: 10px;
 }
 
 .iucnImage {
     cursor: pointer;
-    float: right;
-    padding-left:10px;
+    float: left;
+    padding-left: 10px;
 }
-#logos{
+
+#logos {
 }
+
 .EX {
     background-color: #000000;
 }
