@@ -172,6 +172,7 @@
             function hideLoading(){
                 dojo.byId("loadingDiv").style.visibility = "hidden";
                 map.enableMapNavigation();
+                map.disablePan();
             }
             
             //GETS THE EXTENT OF THE PASSED SPECIES USING A SOE
@@ -236,7 +237,7 @@
                             dojo.byId("sources").innerHTML = "Citation: No citation available";
                         }
                         else {
-                            dojo.byId("sources").innerHTML = "Citation:" + sources[0].Source;
+                            dojo.byId("sources").innerHTML = "Citation: " + sources[0].Source;
                         }
                     },
                     error: esriConfig.defaults.io.errorHandler
@@ -287,17 +288,23 @@
                     dojo.byId("spClass").innerHTML = capitaliseFirstLetter(species['class']);
                     dojo.byId("spOrder").innerHTML = capitaliseFirstLetter(species['order']);
                     dojo.byId("spFamily").innerHTML = capitaliseFirstLetter(species['family']);
-                    dojo.byId("spGenus").innerHTML = capitaliseFirstLetter(species['genus']);
                     dojo.byId("spAuthority").innerHTML = species['authority'];
-                    dojo.byId("species").innerHTML = "<i>" + species['scientific_name'] + "</i>";
                     dojo.byId("statusImage").src = "images/RL_" + species['category'] + ".png";
                     setImageTitle(species['category']);
                     var synonymy = results.common_names;
                     if (synonymy.length > 0) {
                         dojo.doc.title = species['scientific_name'] + " (" + synonymy[0]['name'] + ")";
+                        dojo.byId("species").innerHTML = "<i>" + species['scientific_name'] + "</i> (" + synonymy[0]['name'] + ")";
                     }
                     else {
+                        dojo.byId("species").innerHTML = "<i>" + species['scientific_name'] + "</i>";
                         dojo.doc.title = species['scientific_name'];
+                    }
+                    if (species['modified_year'] > 0) {
+                        dojo.byId("yearOfAssessment").innerHTML = "Assessed: " + species['modified_year'];
+                    }
+                    else {
+                        dojo.byId("yearOfAssessment").innerHTML = "Assessed: Not known";
                     }
                 }
                 else {
@@ -379,8 +386,6 @@
                         </li>
                         <li id="spFamily" class="LI">
                         </li>
-                        <li id="spGenus" class="rightLI">
-                        </li>
                     </ul>
                 </div>
                 <div id="species">
@@ -415,6 +420,8 @@
                     </span>
                     <div id="sources">
                     </div>
+                    <div id="yearOfAssessment">
+                    </div>
                 </div>
                 <div id="footer">
                     <div id="termsText">
@@ -425,8 +432,16 @@
                             Published by IUCN
                         </div>
                     </div>
-                    <div id="iucnImage">
+                </div>
+                <div id="logos">
+                    <div class="iucnImage">
                         <img src="images/iucn.png" alt="IUCN Image" title="IUCN Redlist Website" onclick="window.open('http://www.iucnredlist.org/')">
+                    </div>
+                    <div class="iucnImage" style="padding-top:20px;">
+                        <img src="images/ssc_logo.gif" alt="SSC Image" title="Species Survival Commission" onclick="window.open('http://www.iucn.org/about/work/programmes/species/about_ssc/')">
+                    </div>
+                    <div class="iucnImage" style="padding-top:15px;">
+                        <img src="images/iucn_logo.gif" alt="IUCN Image" title="IUCN" onclick="window.open('http://www.iucn.org/')">
                     </div>
                 </div>
             </div>

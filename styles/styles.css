@@ -199,8 +199,6 @@ html, body {
 }
 
 #termsText {
-    width: 50%;
-    float: left;
 }
 
 .terms {
@@ -265,11 +263,13 @@ html, body {
     margin: 10px;
 }
 
-#iucnImage {
+.iucnImage {
     cursor: pointer;
     float: right;
+    padding-left:10px;
 }
-
+#logos{
+}
 .EX {
     background-color: #000000;
 }
