@@ -31,7 +31,7 @@
             dojo.require("dojo.window");
             dojo.require("esri.map");
             dojo.require("dijit.Tooltip");
-            var map, extentMap, renderer, navToolbar, resizeTimer, basemapGalleryOpen;
+            var ID_NO, map, extentMap, renderer, navToolbar, resizeTimer, basemapGalleryOpen;
             var layerDefinitions = []; //used to filter the results for an individual species
             dojo.addOnLoad(onLoad);
             
@@ -394,9 +394,9 @@
                         </li>
                     </ul>
                 </div>
-                <div id="species">
+                <div id="species" onclick="window.open('http://www.iucnredlist.org/apps/redlist/details/' + parseInt(ID_NO) + '/0')" title="View full species page">
                 </div>
-                <div id="commonName">
+                <div id="commonName" onclick="window.open('http://www.iucnredlist.org/apps/redlist/details/' + parseInt(ID_NO) + '/0')" title="View full species page">
                 </div>
                 <div id="spAuthority">
                 </div>
