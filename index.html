@@ -275,7 +275,6 @@
                         showExtentMap();
                         dojo.byId("mainLoadingDiv").style.visibility = "hidden"; //hide the main loading div
                         dojo.byId("mapDiv").style.visibility = "visible"; //show the map
-                        dojo.byId("panel").style.visibility = "visible"; //show the panel
                         dojo.connect(rdbLayer, "onUpdate", function(e){
                             hideLoading(); //hide the loading div at the end of the rdblayer update
                         });
@@ -400,6 +399,7 @@
                 else {
                     dojo.byId("title").innerHTML = "No species found";
                 }
+                dojo.byId("panel").style.visibility = "visible"; //show the panel
             }
             
             function capitaliseFirstLetter(word){
