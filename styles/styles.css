@@ -203,7 +203,7 @@ html, body {
     background-color: white;
     overflow: auto;
     visibility: hidden;
-    padding: 15px;
+    padding: 15px 15px 0px 15px;
     border: 1px solid #666;
     border-top-left-radius: 6px;
     border-bottom-left-radius: 6px;
