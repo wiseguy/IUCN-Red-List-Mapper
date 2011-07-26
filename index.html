@@ -113,16 +113,6 @@
                 //ADD THE DYNAMIC LAYERS TO THE MAP
                 var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer");
                 map.addLayer(basemap);
-                var imageParameters = new esri.layers.ImageParameters(); //image parameters for the layer
-                imageParameters.layerIds = [0]; //layer filter for species range data
-                imageParameters.layerOption = esri.layers.ImageParameters.LAYER_OPTION_SHOW;
-                rdbLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer?token=" + token, {
-                    "imageParameters": imageParameters,
-                    opacity: 0.7
-                });
-                layerDefinitions[0] = "ID_NO='" + ID_NO + "'"; //set the initial definition expression
-                rdbLayer.setLayerDefinitions(layerDefinitions); //apply the definition expression
-                map.addLayer(rdbLayer);
                 
                 //ADD THE TOOLBAR
                 navToolbar = new esri.toolbars.Navigation(map);
@@ -272,6 +262,7 @@
                         var centreAty = speciesExtent.getCenter().y;
                         var centre = new esri.geometry.Point(centreAtx, centreAty, sr);
                         map.centerAndZoom(centre, LOD);
+                        addSpeciesRangeMap();
                         showExtentMap();
                         dojo.byId("mainLoadingDiv").style.visibility = "hidden"; //hide the main loading div
                         dojo.byId("mapDiv").style.visibility = "visible"; //show the map
@@ -281,6 +272,19 @@
                     },
                     error: esriConfig.defaults.io.errorHandler
                 });
+            }
+            
+            function addSpeciesRangeMap(){
+                var imageParameters = new esri.layers.ImageParameters(); //image parameters for the layer
+                imageParameters.layerIds = [0]; //layer filter for species range data
+                imageParameters.layerOption = esri.layers.ImageParameters.LAYER_OPTION_SHOW;
+                rdbLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer?token=" + token, {
+                    "imageParameters": imageParameters,
+                    opacity: 0.7
+                });
+                layerDefinitions[0] = "ID_NO='" + ID_NO + "'"; //set the initial definition expression
+                rdbLayer.setLayerDefinitions(layerDefinitions); //apply the definition expression
+                map.addLayer(rdbLayer);              
             }
             
             //gets the bounds of the visible area (i.e. to the left of the panel)
