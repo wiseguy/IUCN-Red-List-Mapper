@@ -295,9 +295,6 @@
 						console.log("Extent calculated")
 						addSpeciesRangeMap();
 						showExtentMap();
-						//hide the main loading div
-						dojo.byId("mainLoadingDiv").style.visibility = "hidden";
-						dojo.byId("mapDiv").style.visibility = "visible";
 					},
 					error : esriConfig.defaults.io.errorHandler
 				});
@@ -320,12 +317,13 @@
 				rdbLayer.setLayerDefinitions(layerDefinitions);
 				//apply the definition expression
 				console.log("Adding RDB layer");
+				map.addLayer(rdbLayer);
 				dojo.connect(rdbLayer, "onUpdate", function(e) {
 					console.log("RDB layer loaded");
+					dojo.byId("mainLoadingDiv").style.visibility = "hidden"; //all loaded so hide the main loading div
+					dojo.byId("mapDiv").style.opacity = "1";
 					hideLoading();
-					//hide the loading div at the end of the rdblayer update
 				});
-				map.addLayer(rdbLayer);
 			}
 
 			//gets the bounds of the visible area (i.e. to the left of the panel)
@@ -394,6 +392,9 @@
 			//CALLED WHEN THE MAP EXTENT CHANGES AND DRAWS THE POLYGON ON THE OVERVIEW MAP
 			function extentChanged(extent) {
 				console.log("extentChanged");
+				if(extentMap == undefined) { //may not be instantiated 
+					return null;
+				};
 				extentMap.graphics.clear();
 				var polygon = new esri.geometry.Polygon(new esri.SpatialReference({
 					wkid : 102100
