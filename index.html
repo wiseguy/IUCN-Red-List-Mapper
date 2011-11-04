@@ -295,6 +295,9 @@
 						console.log("Extent calculated")
 						addSpeciesRangeMap();
 						showExtentMap();
+						//hide the main loading div
+						dojo.byId("mainLoadingDiv").style.visibility = "hidden";
+						dojo.byId("mapDiv").style.visibility = "visible";
 					},
 					error : esriConfig.defaults.io.errorHandler
 				});
@@ -319,8 +322,6 @@
 				console.log("Adding RDB layer");
 				dojo.connect(rdbLayer, "onUpdate", function(e) {
 					console.log("RDB layer loaded");
-					dojo.byId("mainLoadingDiv").style.visibility = "hidden";
-					dojo.byId("mapDiv").style.visibility = "visible";
 					hideLoading();
 					//hide the loading div at the end of the rdblayer update
 				});
@@ -392,10 +393,8 @@
 
 			//CALLED WHEN THE MAP EXTENT CHANGES AND DRAWS THE POLYGON ON THE OVERVIEW MAP
 			function extentChanged(extent) {
+				if (extentMap==undefined){return null};
 				console.log("extentChanged");
-				if(extentMap == undefined) { //may not be instantiated 
-					return null;
-				};
 				extentMap.graphics.clear();
 				var polygon = new esri.geometry.Polygon(new esri.SpatialReference({
 					wkid : 102100
