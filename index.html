@@ -295,15 +295,9 @@
 						console.log("Extent calculated")
 						addSpeciesRangeMap();
 						showExtentMap();
-						dojo.byId("mainLoadingDiv").style.visibility = "hidden";
 						//hide the main loading div
+						dojo.byId("mainLoadingDiv").style.visibility = "hidden";
 						dojo.byId("mapDiv").style.visibility = "visible";
-						//show the map
-						dojo.connect(rdbLayer, "onUpdate", function(e) {
-							console.log("RDB layer loaded");
-							hideLoading();
-							//hide the loading div at the end of the rdblayer update
-						});
 					},
 					error : esriConfig.defaults.io.errorHandler
 				});
@@ -326,6 +320,11 @@
 				rdbLayer.setLayerDefinitions(layerDefinitions);
 				//apply the definition expression
 				console.log("Adding RDB layer");
+				dojo.connect(rdbLayer, "onUpdate", function(e) {
+					console.log("RDB layer loaded");
+					hideLoading();
+					//hide the loading div at the end of the rdblayer update
+				});
 				map.addLayer(rdbLayer);
 			}
 
