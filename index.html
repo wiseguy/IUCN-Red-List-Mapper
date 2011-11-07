@@ -97,14 +97,12 @@
             dojo.addOnLoad(onLoad);
             
             function onLoad(){
-                ID_NO = getSpeciesID(); //get the species ID from the query string
-                getLegendClasses(ID_NO); //get the legend classes of the current species, e.g. native, extinct etc.
-                getSource(ID_NO); //get the source
-                getSpeciesInfo(ID_NO); //get the species info
+                getSpeciesID(); //get the species ID from the query string
+                getSpatialDataSource();
                 map = new esri.Map("map", {
                     wrapAround180: true
                 });
-                dojo.connect(map, "onLoad", mapLoaded);
+                dojo.connect(map, "onLoad", createScaleBar);
                 dojo.connect(map, "onZoomStart", showLoading);
                 dojo.connect(map, "onPanStart", showLoading);
                 dojo.connect(map, "onExtentChange", extentChanged);
@@ -126,11 +124,37 @@
                 
             }
             
-            function mapLoaded()
-            {
-                getExtent(ID_NO); //get the extent of the current species
-            	createScaleBar();
+            function getSpatialDataSource(){
+                esri.request({
+                    url: "http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/1/query/",
+                    callbackParamName: "callback",
+                    content: {
+                        f: "json",
+                        where: "ID_NO='" + ID_NO + "'",
+                        token: token,
+                        returnGeometry: false,
+                        outFields: "SpatialDataSource"
+                    },
+                    load: function(response){
+                        spatialDataSource = response.features[0].attributes["SpatialDataSource"];
+                        switch (spatialDataSource) {
+                            case "SpeciesRangeMaps":
+                                getExtent(); //get the extent of the current species
+                                getLegendClasses(); //get the legend classes of the current species, e.g. native, extinct etc.
+                                getSource(); //get the source
+                                break;
+                            case "Watersheds":
+                                getExtentWatersheds(); //get the extent of the current species (watersheds)
+                                break;
+                            default:
+                                alert("default");
+                        }
+                        getSpeciesInfo(); //get the species info
+                    },
+                    error: esriConfig.defaults.io.errorHandler
+                });
             }
+            
             function createExtentMap(){
                 extentMap = new esri.Map("extentMap", {
                     slider: false,
@@ -215,8 +239,7 @@
             //GETS THE SPECIES ID FROM THE QUERYSTRING
             function getSpeciesID(){
                 var queryParams = dojo.queryToObject(window.location.search.slice(1)); //get the query parameters
-                var ID_NO = parseInt(queryParams["ID_NO"]); //get the ID_NO for the species
-                return ID_NO;
+                ID_NO = parseInt(queryParams["ID_NO"]); //get the ID_NO for the species
             }
             
             //SHOWS THE LOADING IMAGE WHEN THE RDB LAYER IS LOADING
@@ -230,13 +253,13 @@
             }
             
             //GETS THE EXTENT OF THE PASSED SPECIES USING A SOE
-            function getExtent(spcID){
+            function getExtent(){
                 esri.request({
                     url: "http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/exts/IUCNRedListSOE/GetSpeciesExtent",
                     callbackParamName: "callback",
                     content: {
                         f: "json",
-                        ID_NO: spcID,
+                        ID_NO: ID_NO,
                         token: token
                     },
                     load: function(response){
@@ -269,9 +292,9 @@
                         addSpeciesRangeMap();
                         showExtentMap();
                         dojo.connect(rdbLayer, "onUpdate", function(e){
-	                        dojo.byId("mainLoadingDiv").style.visibility = "hidden"; //hide the main loading div
-	                        dojo.byId("mapDiv").style.opacity = "1"; //show the map
-	                        dojo.byId("extentMapHolder").style.opacity = "1"; //show the extent map
+                            dojo.byId("mainLoadingDiv").style.visibility = "hidden"; //hide the main loading div
+                            dojo.byId("mapDiv").style.opacity = "1"; //show the map
+                            dojo.byId("extentMapHolder").style.opacity = "1"; //show the extent map
                             hideLoading(); //hide the loading div at the end of the rdblayer update
                         });
                     },
@@ -289,17 +312,17 @@
                 });
                 layerDefinitions[0] = "ID_NO='" + ID_NO + "'"; //set the initial definition expression
                 rdbLayer.setLayerDefinitions(layerDefinitions); //apply the definition expression
-                map.addLayer(rdbLayer);              
+                map.addLayer(rdbLayer);
             }
             
             //GETS THE LEGEND CLASSES OF THE PASSED SPECIES USING A SOE
-            function getLegendClasses(spcID){
+            function getLegendClasses(){
                 esri.request({
                     url: "http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/exts/IUCNRedListSOE/GetLegendClasses",
                     callbackParamName: "callback",
                     content: {
                         f: "json",
-                        ID_NO: spcID,
+                        ID_NO: ID_NO,
                         token: token
                     },
                     load: function(response){
@@ -311,13 +334,13 @@
             }
             
             //GETS THE Source THE PASSED SPECIES USING A SOE
-            function getSource(spcID){
+            function getSource(){
                 esri.request({
                     url: "http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/exts/IUCNRedListSOE/GetSources",
                     callbackParamName: "callback",
                     content: {
                         f: "json",
-                        ID_NO: spcID,
+                        ID_NO: ID_NO,
                         token: token
                     },
                     load: function(response){
@@ -343,7 +366,9 @@
             
             //CALLED WHEN THE MAP EXTENT CHANGES AND DRAWS THE POLYGON ON THE OVERVIEW MAP
             function extentChanged(extent){
-                if(extentMap==undefined){return};
+                if (extentMap == undefined) {
+                    return;
+                };
                 extentMap.graphics.clear();
                 var polygon = new esri.geometry.Polygon(new esri.SpatialReference({
                     wkid: 102100
@@ -365,9 +390,9 @@
             }
             
             //CALLED WHEN THE PAGE LOADS AND GETS THE SPECIES INFO
-            function getSpeciesInfo(spcID){
+            function getSpeciesInfo(){
                 dojo.io.script.get({
-                    url: "http://api.iucnredlist.org/common_names/" + spcID + ".js?callback=parseSpeciesData"
+                    url: "http://api.iucnredlist.org/common_names/" + ID_NO + ".js?callback=parseSpeciesData"
                 });
             }
             
