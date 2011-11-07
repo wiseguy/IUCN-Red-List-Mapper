@@ -98,14 +98,13 @@
             
             function onLoad(){
                 ID_NO = getSpeciesID(); //get the species ID from the query string
-                getExtent(ID_NO); //get the extent of the current species
                 getLegendClasses(ID_NO); //get the legend classes of the current species, e.g. native, extinct etc.
                 getSource(ID_NO); //get the source
                 getSpeciesInfo(ID_NO); //get the species info
                 map = new esri.Map("map", {
                     wrapAround180: true
                 });
-                dojo.connect(map, "onLoad", createScaleBar);
+                dojo.connect(map, "onLoad", mapLoaded);
                 dojo.connect(map, "onZoomStart", showLoading);
                 dojo.connect(map, "onPanStart", showLoading);
                 dojo.connect(map, "onExtentChange", extentChanged);
@@ -127,6 +126,11 @@
                 
             }
             
+            function mapLoaded()
+            {
+                getExtent(ID_NO); //get the extent of the current species
+            	createScaleBar();
+            }
             function createExtentMap(){
                 extentMap = new esri.Map("extentMap", {
                     slider: false,
@@ -264,9 +268,10 @@
                         map.centerAndZoom(centre, LOD);
                         addSpeciesRangeMap();
                         showExtentMap();
-                        dojo.byId("mainLoadingDiv").style.visibility = "hidden"; //hide the main loading div
-                        dojo.byId("mapDiv").style.visibility = "visible"; //show the map
                         dojo.connect(rdbLayer, "onUpdate", function(e){
+	                        dojo.byId("mainLoadingDiv").style.visibility = "hidden"; //hide the main loading div
+	                        dojo.byId("mapDiv").style.opacity = "1"; //show the map
+	                        dojo.byId("extentMapHolder").style.opacity = "1"; //show the extent map
                             hideLoading(); //hide the loading div at the end of the rdblayer update
                         });
                     },
@@ -285,17 +290,6 @@
                 layerDefinitions[0] = "ID_NO='" + ID_NO + "'"; //set the initial definition expression
                 rdbLayer.setLayerDefinitions(layerDefinitions); //apply the definition expression
                 map.addLayer(rdbLayer);              
-            }
-            
-            //gets the bounds of the visible area (i.e. to the left of the panel)
-            function getVisibleExtent(){
-                var panel = dojo.byId("panel");
-                var coords = dojo.coords(panel);
-                var point = map.toMap(new esri.geometry.Point(coords.x, coords.y));
-                var targetExtent = new esri.geometry.Extent(map.extent.xmin, map.extent.ymin, point.x, map.extent.ymax, new esri.SpatialReference({
-                    wkid: 102100
-                }));
-                return targetExtent;
             }
             
             //GETS THE LEGEND CLASSES OF THE PASSED SPECIES USING A SOE

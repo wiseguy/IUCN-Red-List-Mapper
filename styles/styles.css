@@ -40,7 +40,7 @@ html, body {
 	top: 0;
 	position: absolute;
 	z-index: 1;
-	visibility: hidden;
+	opacity: 0;
 }
 #map {
 	width: 100%;
@@ -68,7 +68,7 @@ html, body {
 	left: 65px;
 	top: 15px;
 	border: 1px solid #555;
-	visibility: hidden;
+	opacity: 0;
 }
 #extentMap {
 	width: 250px;
