@@ -31,7 +31,7 @@
             dojo.require("dojo.window");
             dojo.require("esri.map");
             dojo.require("dijit.Tooltip");
-            var ID_NO, map, extentMap, renderer, navToolbar, resizeTimer, basemapGalleryOpen;
+            var ID_NO, map, extentMap, renderer, navToolbar, resizeTimer, basemapGalleryOpen, pfafstetterLevel, watershedsLayer;
             var layerDefinitions = []; //used to filter the results for an individual species
             var LODs = [{
                 LOD: 0,
@@ -144,7 +144,8 @@
                                 getSource(); //get the source
                                 break;
                             case "Watersheds":
-                                getExtentWatersheds(); //get the extent of the current species (watersheds)
+                                createWatershedsLayer();
+//                                getExtentWatersheds(); //get the extent of the current species (watersheds)
                                 break;
                             default:
                                 alert("default");
@@ -153,6 +154,71 @@
                     },
                     error: esriConfig.defaults.io.errorHandler
                 });
+            }
+            
+            function createWatershedsLayer(){
+                var imageParameters = new esri.layers.ImageParameters();
+                var layerDefs = [];
+                layerDefs[0] = "\"PFAF_1\" in (select PFAF_1 from dbo_PanAfrica_fish_hydrosheds_with_pfaf_codes where \"Binomial\" ='Alestes baremoze')";
+                imageParameters.layerDefinitions = layerDefs;
+                watershedsLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://79.125.16.106/ArcGIS/rest/services/Andrew/Watersheds/MapServer?token=" + token, {
+                    "imageParameters": imageParameters,
+                    opacity: 0.7
+                });
+                watershedsLayer.setVisibleLayers([0]);
+                map.addLayer(watershedsLayer);
+                initialLoadComplete();
+                dojo.connect(map, "onExtentChange", function(extent, delta, levelChange, lod){
+                    if (levelChange) {
+                        setPfafstetterLevel(lod);
+                    }
+                });
+                
+            }
+            
+            function setPfafstetterLevel(lod){
+                switch (lod.level) {
+                    case 1:
+                        pfafstetterLevel = 1;
+                        break;
+                    case 2:
+                        pfafstetterLevel = 2;
+                        break;
+                    case 3:
+                        pfafstetterLevel = 3;
+                        break;
+                    case 4:
+                        pfafstetterLevel = 4;
+                        break;
+                    case 5:
+                        pfafstetterLevel = 5;
+                        break;
+                    case 6:
+                        pfafstetterLevel = 6;
+                        break;
+                    case 7:
+                        pfafstetterLevel = 7;
+                        break;
+                    case 8:
+                        pfafstetterLevel = 8;
+                        break;
+                    case 9:
+                        pfafstetterLevel = 9;
+                        break;
+                    default:
+                        pfafstetterLevel = 10;
+                        break;
+                }
+                watershedsLayer.setVisibleLayers([pfafstetterLevel - 1]);
+                var layerDefs = [];
+                if (pfafstetterLevel < 10) {
+                    var tmp = pfafstetterLevel.toString();
+                    layerDefs[pfafstetterLevel - 1] = "\"PFAF_" + tmp + "\" in (select PFAF_" + tmp + " from dbo_PanAfrica_fish_hydrosheds_with_pfaf_codes where \"Binomial\" ='Alestes baremoze')";
+                }
+                else {
+                    layerDefs[9] = "\"BasinID\" in (select BasinID from dbo_PanAfrica_fish_hydrosheds_with_pfaf_codes where \"Binomial\" ='Alestes baremoze')";
+                }
+                watershedsLayer.setLayerDefinitions(layerDefs);
             }
             
             function createExtentMap(){
@@ -290,16 +356,20 @@
                         var centre = new esri.geometry.Point(centreAtx, centreAty, sr);
                         map.centerAndZoom(centre, LOD);
                         addSpeciesRangeMap();
-                        showExtentMap();
                         dojo.connect(rdbLayer, "onUpdate", function(e){
-                            dojo.byId("mainLoadingDiv").style.visibility = "hidden"; //hide the main loading div
-                            dojo.byId("mapDiv").style.opacity = "1"; //show the map
-                            dojo.byId("extentMapHolder").style.opacity = "1"; //show the extent map
-                            hideLoading(); //hide the loading div at the end of the rdblayer update
+                            initialLoadComplete();
                         });
                     },
                     error: esriConfig.defaults.io.errorHandler
                 });
+            }
+            
+            function initialLoadComplete(){
+                showExtentMap();
+                dojo.byId("mainLoadingDiv").style.visibility = "hidden"; //hide the main loading div
+                dojo.byId("mapDiv").style.opacity = "1"; //show the map
+                dojo.byId("extentMapHolder").style.opacity = "1"; //show the extent map
+                hideLoading(); //hide the loading div at the end of the rdblayer update
             }
             
             function addSpeciesRangeMap(){
