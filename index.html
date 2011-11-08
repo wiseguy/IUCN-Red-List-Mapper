@@ -365,16 +365,6 @@
 				});
 			}
 
-			function initialLoadComplete() {
-				showExtentMap();
-				dojo.byId("mainLoadingDiv").style.visibility = "hidden";
-				//hide the main loading div
-				dojo.byId("mapDiv").style.opacity = "1";
-				//show the map
-				dojo.byId("extentMapHolder").style.opacity = "1";
-				//show the extent map
-			}
-
 			function addSpeciesRangeMap() {
 				var imageParameters = new esri.layers.ImageParameters();
 				//image parameters for the layer
@@ -389,11 +379,21 @@
 				//set the initial definition expression
 				rdbLayer.setLayerDefinitions(layerDefinitions);
 				//apply the definition expression
+				var handle = dojo.connect(rdbLayer, "onUpdate", function(e) {
+					showExtentMap();
+					dojo.byId("mainLoadingDiv").style.visibility = "hidden";
+					//hide the main loading div
+					dojo.byId("mapDiv").style.opacity = "1";
+					//show the map
+					dojo.byId("extentMapHolder").style.opacity = "1";
+					//show the extent map
+					dojo.disconnect(handle);
+				});
 				dojo.connect(rdbLayer, "onUpdate", function(e) {
-					hideLoading();//hide the loading div at the end of the rdblayer update
+					hideLoading();
+					//hide the loading div at the end of the rdblayer update
 				});
 				map.addLayer(rdbLayer);
-				initialLoadComplete();
 			}
 
 			//GETS THE LEGEND CLASSES OF THE PASSED SPECIES USING A SOE
