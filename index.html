@@ -253,7 +253,8 @@
 			}
 
 			function toggleBasemap() {
-				if(dojo.byId("basemapGalleryDiv").style.visibility == "hidden") {
+				div = dojo.byId("basemapGalleryDiv");
+				if(div.style.visibility == "hidden") {
 					showBasemapGallery();
 				} else {
 					hideBasemapGallery();
@@ -602,7 +603,7 @@
 				<div id="checkboxes">
 					<span>
 						<input dojoType="dijit.form.CheckBox" onclick="toggleBasemap()" id="basemapGalleryButton">
-						</input> <label for="basemapGalleryButton"> Basemap </label> </span>
+						</input> <label for="basemapGalleryButton"> Basemap   </label> </span>
 					<span>
 						<input dojoType="dijit.form.CheckBox" onclick="toggleExtentMap()" id="extentButton" checked="true">
 						</input> <label for="extentButton"> Overview map </label> </span>
@@ -665,7 +666,7 @@
 			<div dojoType="dijit.Tooltip" connectId="deactivate" position="below">
 				Deactivate the current tool
 			</div>
-			<div id="basemapGalleryDiv" dojoType="dijit.layout.ContentPane" id="basemapGalleryDiv" style="width:360px;height:545px;">
+			<div id="basemapGalleryDiv" dojoType="dijit.layout.ContentPane" id="basemapGalleryDiv" style="width:360px;height:450px;visibility:hidden">
 				<img src="images/cross.png" class="close" title="Close" onclick="hideBasemapGallery()"/>
 				<div id="basemapGallery"></div>
 			</div>
