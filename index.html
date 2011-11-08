@@ -481,7 +481,7 @@
                     var synonymy = results.common_names;
                     if (synonymy.length > 0) {
                         dojo.doc.title = species['scientific_name'] + " (" + synonymy[0]['name'] + ")";
-                        dojo.byId("commonName").innerHTML = "(" + synonymy[0]['name'] + ")";
+                        dojo.byId("commonName").innerHTML = synonymy[0]['name'];
                     }
                     if (species['modified_year'] > 0) {
                         dojo.byId("yearOfAssessment").innerHTML = "Assessment date: " + species['modified_year'];
