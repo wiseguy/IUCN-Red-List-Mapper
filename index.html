@@ -165,7 +165,7 @@
 				var layerDefs = [];
 				layerDefs[0] = "\"PFAF_1\" in (select PFAF_1 from dbo_PanAfrica_fish_hydrosheds_with_pfaf_codes where \"Binomial\" ='Alestes baremoze')";
 				imageParameters.layerDefinitions = layerDefs;
-				watershedsLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://79.125.16.106/ArcGIS/rest/services/Andrew/Watersheds/MapServer?token=" + token, {
+				watershedsLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Watersheds/MapServer?token=" + token, {
 					"imageParameters" : imageParameters,
 					opacity : 0.7
 				});
