@@ -163,13 +163,15 @@
       function createWatershedsLayer() {
         var imageParameters = new esri.layers.ImageParameters();
         var layerDefs = [];
-        layerDefs[0] = "\"PFAF_1\" in (select PFAF_1 from SpeciesDataWithPFAFs where \"ID_NO\" ='" + ID_NO + "')";
+//        layerDefs[0] = "\"PFAF_1\" in (select PFAF_1 from SpeciesDataWithPFAFs where \"ID_NO\" ='" + ID_NO + "')";
+        layerDefs[7] = "\"PFAF_8\" in (select PFAF_8 from SpeciesDataWithPFAFs where \"ID_NO\" ='" + ID_NO + "')";
         imageParameters.layerDefinitions = layerDefs;
         watershedsLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Watersheds/MapServer?token=" + token, {
           "imageParameters" : imageParameters,
           opacity : 0.7
         });
-        watershedsLayer.setVisibleLayers([0]);
+        // watershedsLayer.setVisibleLayers([0]);
+        watershedsLayer.setVisibleLayers([7]);
         map.addLayer(watershedsLayer);
         addOnLoadComplete(watershedsLayer);
         addOnLayerUpdate(watershedsLayer);
@@ -183,25 +185,25 @@
       function setPfafstetterLevel(lod) {
         switch (lod.level) {
           case 1:
-            pfafstetterLevel = 1;
+            pfafstetterLevel = 8;
             break;
           case 2:
-            pfafstetterLevel = 2;
+            pfafstetterLevel = 8;
             break;
           case 3:
-            pfafstetterLevel = 3;
+            pfafstetterLevel = 8;
             break;
           case 4:
-            pfafstetterLevel = 4;
+            pfafstetterLevel = 8;
             break;
           case 5:
-            pfafstetterLevel = 5;
+            pfafstetterLevel = 8;
             break;
           case 6:
-            pfafstetterLevel = 6;
+            pfafstetterLevel = 8;
             break;
           case 7:
-            pfafstetterLevel = 7;
+            pfafstetterLevel = 8;
             break;
           case 8:
             pfafstetterLevel = 8;
