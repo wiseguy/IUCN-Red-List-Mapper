@@ -136,6 +136,9 @@
 						outFields : "SpatialDataSource"
 					},
 					load : function(response) {
+						if(response.features.length==0) {alert("No spatial data available");
+							return;
+						}
 						spatialDataSource = response.features[0].attributes["SpatialDataSource"];
 						switch (spatialDataSource) {
 							case "SpeciesRangeMaps":
