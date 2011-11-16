@@ -136,7 +136,7 @@
 						outFields : "SpatialDataSource"
 					},
 					load : function(response) {
-						if(response.features.length==0) {alert("No spatial data available");
+						if(response.features.length == 0) {alert("No spatial data available");
 							return;
 						}
 						spatialDataSource = response.features[0].attributes["SpatialDataSource"];
@@ -484,6 +484,10 @@
 				//get the minimum x screen coordinate
 				var maxX = screenPolygon[2][0];
 				//get the maximum x screen coordinate
+				if(minX < 0) {
+					return;
+					//dont show the extent map if the main map is zoomed out too far otherwise you get an ugly red box that crosses itself on the extent map
+				};
 				if((maxX - minX) < 3) {//if the polygon is smaller than 3 pixels across then it will not be visible, so draw as a point symbol
 					var centroid = extent.getCenter();
 					//get the centroid of the extent
@@ -495,6 +499,10 @@
 					extentMap.graphics.add(new esri.Graphic(polygon, symbol));
 					//create a polygon that is the size and shape of the main map
 				}
+				var newCentre = new esri.geometry.Point(extent.getCenter().x, 0, new esri.SpatialReference({
+					wkid : 102100
+				}))
+				extentMap.centerAt(newCentre);
 			}
 
 			//CALLED WHEN THE PAGE LOADS AND GETS THE SPECIES INFO
