@@ -151,7 +151,8 @@
 								break;
 							case "Watersheds":
 								createWatershedsLayer();
-								//                                getExtentWatersheds(); //get the extent of the current species (watersheds)
+								// getLegendClassesWatersheds();
+								// getExtentWatersheds(); //get the extent of the current species (watersheds)
 								break;
 							default:
 								alert("default");
@@ -163,7 +164,7 @@
 				});
 			}
 
-			var pfafstetterStartLevel = 2;
+			var pfafstetterStartLevel = 9;
 			function createWatershedsLayer() {
 				var imageParameters = new esri.layers.ImageParameters();
 				var layerDefs = [];
@@ -241,7 +242,7 @@
 					wrapAround180 : true
 				});
 				//BASEMAP FOR THE OVERVIEW MAP
-				var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer");
+				var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer");
 				extentMap.addLayer(basemap);
 
 				//EVENT LISTENERS FOR THE MAPS
@@ -659,7 +660,7 @@
 			</div>
 		</div>
 		<div id="mapDiv" dojotype="dijit.layout.BorderContainer" design="headline" gutters="false">
-			<div id="map" dojotype="dijit.layout.ContentPane" region="center">
+			<div id="map" dojotype="dijit.layout.ContentPane" region="center" style="background-color: #dddddd">
 				<div id="loadingDiv">
 					<img id="loadingImg" src="images/loading.gif" alt="Loading image"/>
 				</div>
