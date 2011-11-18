@@ -126,7 +126,7 @@
 
 			function getSpatialDataSource() {
 				esri.request({
-					url : "http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/1/query/",
+					url : "http://mapservices.iucnredlist.org/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/1/query/",
 					callbackParamName : "callback",
 					content : {
 						f : "json",
@@ -171,7 +171,7 @@
 				//        layerDefs[0] = "\"PFAF_1\" in (select PFAF_1 from SpeciesDataWithPFAFs where \"ID_NO\" ='" + ID_NO + "')";
 				layerDefs[pfafstetterStartLevel] = "\"PFAF_" + (pfafstetterStartLevel + 1).toString() + "\" in (select PFAF_" + (pfafstetterStartLevel + 1).toString() + " from SpeciesDataWithPFAFs where \"ID_NO\" ='" + ID_NO + "')";
 				imageParameters.layerDefinitions = layerDefs;
-				watershedsLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Watersheds/MapServer?token=" + token, {
+				watershedsLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://mapservices.iucnredlist.org/ArcGIS/rest/services/IUCN_Secure/Watersheds/MapServer?token=" + token, {
 					"imageParameters" : imageParameters,
 					opacity : 0.7
 				});
@@ -338,7 +338,7 @@
 			//GETS THE EXTENT OF THE PASSED SPECIES USING A SOE
 			function getExtent() {
 				esri.request({
-					url : "http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/exts/IUCNRedListSOE/GetSpeciesExtent",
+					url : "http://mapservices.iucnredlist.org/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/exts/IUCNRedListSOE/GetSpeciesExtent",
 					callbackParamName : "callback",
 					content : {
 						f : "json",
@@ -384,7 +384,7 @@
 				imageParameters.layerIds = [0];
 				//layer filter for species range data
 				imageParameters.layerOption = esri.layers.ImageParameters.LAYER_OPTION_SHOW;
-				rdbLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer?token=" + token, {
+				rdbLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://mapservices.iucnredlist.org/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer?token=" + token, {
 					"imageParameters" : imageParameters,
 					opacity : 0.7
 				});
@@ -421,7 +421,7 @@
 			//GETS THE LEGEND CLASSES OF THE PASSED SPECIES USING A SOE
 			function getLegendClasses() {
 				esri.request({
-					url : "http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/exts/IUCNRedListSOE/GetLegendClasses",
+					url : "http://mapservices.iucnredlist.org/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/exts/IUCNRedListSOE/GetLegendClasses",
 					callbackParamName : "callback",
 					content : {
 						f : "json",
@@ -439,7 +439,7 @@
 			//GETS THE Source THE PASSED SPECIES USING A SOE
 			function getSource() {
 				esri.request({
-					url : "http://79.125.16.106/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/exts/IUCNRedListSOE/GetSources",
+					url : "http://mapservices.iucnredlist.org/ArcGIS/rest/services/IUCN_Secure/Species_WebMercator/MapServer/exts/IUCNRedListSOE/GetSources",
 					callbackParamName : "callback",
 					content : {
 						f : "json",
