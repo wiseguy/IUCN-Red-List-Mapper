@@ -29,6 +29,7 @@
 			dojo.require("dojo.window");
 			dojo.require("esri.map");
 			dojo.require("dijit.Tooltip");
+			dojo.require("dijit.Dialog");
 			var ID_NO, map, extentMap, renderer, navToolbar, resizeTimer, basemapGalleryOpen, pfafstetterLevel, watershedsLayer, centre;
 			var layerDefinitions = [];
 			//used to filter the results for an individual species
@@ -136,7 +137,13 @@
 						outFields : "SpatialDataSource"
 					},
 					load : function(response) {
-						if(response.features.length == 0) {alert("No spatial data available");
+						if(response.features.length == 0) {
+							myDialog = new dijit.Dialog({// create the dialog:
+								title : "IUCN Red List Mapper",
+								content : "<div><p>Spatial data for this species is still being processed and will be made available shortly</p><div style='width:100%;padding-left:90px'><img src='images/iucn.png'/></div></div>",
+								style : "width: 300px"
+							});
+							myDialog.show();
 							return;
 						}
 						spatialDataSource = response.features[0].attributes["SpatialDataSource"];
