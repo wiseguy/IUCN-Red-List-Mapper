@@ -187,11 +187,11 @@
 				map.addLayer(watershedsLayer);
 				addOnLoadComplete(watershedsLayer);
 				addOnLayerUpdate(watershedsLayer);
-				dojo.connect(map, "onExtentChange", function(extent, delta, levelChange, lod) {
-					if(levelChange) {
-						setPfafstetterLevel(lod);
-					}
-				});
+				// dojo.connect(map, "onExtentChange", function(extent, delta, levelChange, lod) {
+					// if(levelChange) {
+						// setPfafstetterLevel(lod);
+					// }
+				// });
 			}
 
 			function setPfafstetterLevel(lod) {
