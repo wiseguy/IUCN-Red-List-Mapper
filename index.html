@@ -176,13 +176,14 @@
 				var imageParameters = new esri.layers.ImageParameters();
 				var layerDefs = [];
 				//        layerDefs[0] = "\"PFAF_1\" in (select PFAF_1 from SpeciesDataWithPFAFs where \"ID_NO\" ='" + ID_NO + "')";
-				layerDefs[pfafstetterStartLevel] = "\"PFAF_" + (pfafstetterStartLevel + 1).toString() + "\" in (select PFAF_" + (pfafstetterStartLevel + 1).toString() + " from SpeciesDataWithPFAFs where \"ID_NO\" ='" + ID_NO + "')";
+				// layerDefs[pfafstetterStartLevel] = "\"PFAF_" + (pfafstetterStartLevel + 1).toString() + "\" in (select PFAF_" + (pfafstetterStartLevel + 1).toString() + " from SpeciesDataWithPFAFs where \"ID_NO\" ='" + ID_NO + "')";
+        layerDefs[9]="\"BasinID\" in (select BasinID from SpeciesDataWithPFAFs where \"ID_NO\" ='" + ID_NO + "')";
 				imageParameters.layerDefinitions = layerDefs;
 				watershedsLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://mapservices.iucnredlist.org/ArcGIS/rest/services/IUCN_Secure/Watersheds/MapServer?token=" + token, {
 					"imageParameters" : imageParameters,
 					opacity : 0.7
 				});
-				// watershedsLayer.setVisibleLayers([0]);
+				watershedsLayer.setVisibleLayers([9]);
 				watershedsLayer.setVisibleLayers([pfafstetterStartLevel]);
 				map.addLayer(watershedsLayer);
 				addOnLoadComplete(watershedsLayer);
