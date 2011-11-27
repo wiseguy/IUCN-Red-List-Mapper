@@ -177,7 +177,7 @@
 				var layerDefs = [];
 				//        layerDefs[0] = "\"PFAF_1\" in (select PFAF_1 from SpeciesDataWithPFAFs where \"ID_NO\" ='" + ID_NO + "')";
 				// layerDefs[pfafstetterStartLevel] = "\"PFAF_" + (pfafstetterStartLevel + 1).toString() + "\" in (select PFAF_" + (pfafstetterStartLevel + 1).toString() + " from SpeciesDataWithPFAFs where \"ID_NO\" ='" + ID_NO + "')";
-        layerDefs[9]="\"BasinID\" in (select BasinID from SpeciesDataWithPFAFs where \"ID_NO\" ='" + ID_NO + "')";
+				layerDefs[9] = "\"BasinID\" in (select BasinID from SpeciesDataWithPFAFs where \"ID_NO\" ='" + ID_NO + "')";
 				imageParameters.layerDefinitions = layerDefs;
 				watershedsLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://mapservices.iucnredlist.org/ArcGIS/rest/services/IUCN_Secure/Watersheds/MapServer?token=" + token, {
 					"imageParameters" : imageParameters,
@@ -189,9 +189,9 @@
 				addOnLoadComplete(watershedsLayer);
 				addOnLayerUpdate(watershedsLayer);
 				// dojo.connect(map, "onExtentChange", function(extent, delta, levelChange, lod) {
-					// if(levelChange) {
-						// setPfafstetterLevel(lod);
-					// }
+				// if(levelChange) {
+				// setPfafstetterLevel(lod);
+				// }
 				// });
 			}
 
@@ -524,7 +524,14 @@
 			//ASYNCHRONOUS CALLBACK FUNCTION WITH THE RESULTS FOR THE SPECIES INFO
 			function parseSpeciesData(results) {
 				if(results.species.length > 0) {
-					var species = results.species[0];
+					var primarySpecies = dojo.filter(results.species, function(item) {
+						return item.primary == true;
+					});//get the preferred species name
+					if(primarySpecies.length > 0) {
+						var species = primarySpecies[0];
+					} else {
+						species = results.species[0]
+					}
 					//get the species data
 					dojo.byId("spClass").innerHTML = capitaliseFirstLetter(species['class']);
 					dojo.byId("spOrder").innerHTML = capitaliseFirstLetter(species['order']);
@@ -711,7 +718,8 @@
 		<script type="text/javascript">
 			var _gaq = _gaq || [];
 			_gaq.push(['_setAccount', 'UA-27198243-1']);
-			_gaq.push(['_trackPageview']); (function() {
+			_gaq.push(['_trackPageview']);
+			(function() {
 				var ga = document.createElement('script');
 				ga.type = 'text/javascript';
 				ga.async = true;
