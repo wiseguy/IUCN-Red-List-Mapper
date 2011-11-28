@@ -158,7 +158,7 @@
 								break;
 							case "Watersheds":
 								createWatershedsLayer();
-								// getLegendClassesWatersheds();
+								getLegendClassesWatersheds();
 								// getExtentWatersheds(); //get the extent of the current species (watersheds)
 								break;
 							default:
@@ -444,6 +444,16 @@
 				});
 			}
 
+			function getLegendClassesWatersheds() {
+				var legendClasses = {
+					"legendclasses" : [{
+						"legendclass" : "Extant (resident)",
+						"imageurl" : "extantR.png"
+					}]
+				};
+				Tempo.prepare('legendItems').render(legendClasses);
+			}
+
 			//GETS THE Source THE PASSED SPECIES USING A SOE
 			function getSource() {
 				esri.request({
@@ -526,7 +536,8 @@
 				if(results.species.length > 0) {
 					var primarySpecies = dojo.filter(results.species, function(item) {
 						return item.primary == true;
-					});//get the preferred species name
+					});
+					//get the preferred species name
 					if(primarySpecies.length > 0) {
 						var species = primarySpecies[0];
 					} else {
@@ -718,8 +729,7 @@
 		<script type="text/javascript">
 			var _gaq = _gaq || [];
 			_gaq.push(['_setAccount', 'UA-27198243-1']);
-			_gaq.push(['_trackPageview']);
-			(function() {
+			_gaq.push(['_trackPageview']); (function() {
 				var ga = document.createElement('script');
 				ga.type = 'text/javascript';
 				ga.async = true;
