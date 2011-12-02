@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=7,IE=9" />
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples
+      on iOS devices-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>WDPA test</title>
+    <link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/2.5/js/dojo/dijit/themes/claro/claro.css">
+    <style>
+      html, body { height: 100%; width: 100%; margin: 0; padding: 0; }
+      #map{padding:0;}
+    </style>
+    <script type="text/javascript">var djConfig = {parseOnLoad: true};</script>
+    <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=2.5"></script>
+    <script type="text/javascript">
+      dojo.require("dijit.layout.BorderContainer");
+      dojo.require("dijit.layout.ContentPane");
+      dojo.require("esri.map");
+	  dojo.require("esri.layers.graphics");
+	  dojo.require("esri.geometry");
+	  dojo.require("esri.graphic");
+	        dojo.addOnLoad(onLoad);
+      var map;
+	  //var WDPAurl = "http://stage-www.tinypla.net/api2/sites/478391.geo_json";
+	  var WDPAurl = "http://ags10.blueraster.net/iucn/v2/geojson/geojson.txt";
+	        function onLoad() {
+	  
+	    // PROXY
+	   esri.config.defaults.io.proxyUrl = "/proxy/proxy.ashx";
+	   esri.config.defaults.io.alwaysUseProxy = false;
+	   }
+      function init() {
+        var initExtent = new esri.geometry.Extent({"xmin":-13618161,"ymin":5892040,"xmax":-13450611,"ymax":5962515,"spatialReference":{"wkid":102100}});
+        map = new esri.Map("map",{extent:initExtent});
+       
+        //Add world imagery to the map. View the ArcGIS Online site for services http://arcgisonline/home/search.html?t=content&f=typekeywords:service    
+        var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer");
+        map.addLayer(basemap);
+       
+        var referenceLayer = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer");
+        map.addLayer(referenceLayer);
+       
+ 
+        dojo.connect(map, 'onLoad', function(theMap) {
+          //resize the map when the browser resizes
+          dojo.connect(dijit.byId('map'), 'resize', map,map.resize);
+		  loadWDPA();
+        });
+		
+		
+      }
+	  	function requestFailed(error) {
+        console.log('failed');
+      }
+	  
+	  function loadWDPA() {
+
+		var requestHandle = esri.request({
+          url : WDPAurl,
+          load: WDPAsuccess,
+		  handleAs: "json",
+          error: requestFailed
+        }, {useProxy: false});
+
+      }
+	  
+	  function WDPAsuccess(geojson, io) {
+	  WDPAlayer = new esri.layers.GraphicsLayer({id:"WDPAlayer"});
+	  //console.log(geojson.official.GEOM);
+	  var testJson=  eval('(' + geojson.public.GEOM+ ')');
+	  
+	  var sfs = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
+ new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_DASHDOT,
+ new dojo.Color([255,0,0]), 2),new dojo.Color([255,255,0,0.25]));
+/*	  
+	  var myPolygon1 = {"geometry":{"rings":geojson.official.GEOM.coordinates,"spatialReference":{"wkid":4326}},
+  "symbol":{"color":[0,0,0,64],"outline":{"color":[0,0,0,255],
+  "width":1,"type":"esriSLS","style":"esriSLSSolid"},
+  "type":"esriSFS","style":"esriSFSSolid"}};
+*/
+//var polygonJson  = {"rings":testJson.coordinates,"spatialReference":{" wkid":4326 }};
+var polygon = new esri.geometry.Polygon();  
+			  var rings;
+			  rings = testJson.coordinates;
+					for (var r=0, rl=rings.length; r<rl; r++) {
+					//add ring to combined polygon
+					for (var i=0, r2=rings[r].length; i<r2; i++){
+					polygon.addRing(rings[r][i]);
+					console.log("next ring");
+					console.log(rings[r][i]);					
+					}					
+					}
+					//console.log(polygon.getExtent());
+var geom = esri.geometry.geographicToWebMercator(polygon); 
+var gra1 = new esri.Graphic(geom,sfs);
+
+WDPAlayer.add(gra1);	
+
+map.addLayer(WDPAlayer);
+map.setExtent(geom.getExtent());
+
+	}
+      dojo.addOnLoad(init);
+    </script>
+  </head>
+ 
+  <body class="claro">
+    <div dojotype="dijit.layout.BorderContainer" design="headline" gutters="false"
+    style="width: 100%; height: 100%; margin: 0;">
+      <div id="map" dojotype="dijit.layout.ContentPane" region="center" style="overflow:hidden;">
+      </div>
+    </div>
+  </body>
+
+</html> 

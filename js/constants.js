@@ -1,1 +1,1 @@
-var token = "5QWY9_apTW2wMDnW_1qS0ac44lXSgs5tLRg3Ooi2xHRcSKcyp4Z2n2t3d0JBPUtw"; //for http://
+var token = "DP7LlK_78sIufOdBsUKA3hPTMNJYngk3nybHDgaXCKQqShTjcbk8hXV6XgsJ6EZV0q98MDHDXpoi6iPHjqjoMA.."; //for http://79.125.16.106/IUCN
